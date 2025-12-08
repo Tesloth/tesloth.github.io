@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Map Test</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+</head>
+<body>
+    <style>
+        #mapContainer {
+            display: flex;
+        }
+        #map {
+            height: 480px;
+            width: 640px;
+        }
+        #listOfOpps {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+
+            li {
+                list-style-type: none;
+                background-color: rgb(228, 228, 228);
+                border-radius: 2px;
+                padding: 8px;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+    
+    <div id="mapContainer">
+        <div id="map"></div>
+        <ul id="listOfOpps">
+            <li>The Wilderness - marker</li>
+            <li>Riparian Park - circle</li>
+            <li>SLV Airport - polygon</li>
+        </ul>
+    </div>
+
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+    <script>
+        const latLong = [37.47, -105.87];
+        const TheWilderness = [37.4745, -105.8691];
+        const riparian = [37.49544, -105.89643];
+        const bgc = [37.4634, -105.8750];
+        const map = L.map('map').setView(latLong, 13);
+
+        // shapes
+        const marker = L.marker(TheWilderness).addTo(map);
+        const circle = L.circle(riparian, {
+            color: 'green',
+            fillColor: 'pink',
+            fillOpacity: 0.5,
+            radius: 640
+        }).addTo(map);
+        const polygon = L.polygon([
+            [37.44437807523011, -105.8750231084758],
+            [37.444159953981924, -105.86546474187946],
+            [37.44781674551189, -105.86542759708091],
+            [37.44783149020707, -105.85705144499818],
+            [37.43482547814241, -105.8572000241925],
+            [37.424413141189106, -105.87473236912152]
+        ]).addTo(map);
+
+        // popups
+        marker.bindPopup("<b>The Wilderness</b>").openPopup();
+        circle.bindPopup("Help maintain trails at Riparian Park!");
+        polygon.bindPopup("Learn to fly from a partner at the SLV Airport!");
+
+        // map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+    </script>
+    
+</body>
+</html>
