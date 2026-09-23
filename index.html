@@ -6,6 +6,833 @@
     <title>Pages Pages Pages Pages Pages</title>
     <link rel="icon" href="data:image/svg+xml, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 108 100'><text y='.9em' font-size='90'>🤩</text></svg>">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            transition: var(--transition);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Login Request (footer) - button, not anchor: the page's
+           smooth-scroll handler binds a[href^="#"] and would throw
+           on a bare "#" href. */
+        .footer-links .login-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            color: rgba(255,255,255,0.8);
+            opacity: 0.4;
+            transition: var(--transition);
+        }
+
+        .footer-links .login-link:hover {
+            color: var(--primary);
+            opacity: 1;
+            padding-left: 5px;
+        }
+
+        #loginModalOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #loginModalOverlay.open {
+            display: flex;
+        }
+
+        .login-modal {
+            background: var(--light);
+            color: var(--dark);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            width: 90%;
+            max-width: 420px;
+            position: relative;
+        }
+
+        .login-modal h3 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .login-modal .modal-note {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+
+        .login-modal .close {
+            position: absolute;
+            top: 8px;
+            right: 16px;
+            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        .login-modal .close:hover {
+            opacity: 1;
+        }
+
+        .login-response {
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .login-response.ok {
+            color: var(--success);
+        }
+
+        .login-response.err {
+            color: var(--danger);
+        }
+
+        .login-back {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+    <!-- CRM-INTEGRATION:STYLE (t_ec042054; scoped under #crmMount) -->
+<style>
+/* ============================================================
+   llt-crm — styles
+   Tokens per design-spec.md §4 (contrast values verified there).
+   Light work surface = default. Dark host = html[data-host="dark"].
+   ============================================================ */
+
+#crmMount {
+  --paper: #F5F1EA;
+  --surface: #FFFFFF;
+  --ink: #1A1712;
+  --ink-soft: #4A443B;
+  --ink-mute: #6B6357;
+  --border: #DDD3C4;
+  --border-strong: #B9AD99;
+  --crm-accent: #B34E0E;
+  --crm-accent-press: #93400B;
+  --crm-accent-tint: #F6E3D3;
+  --crm-accent-text-on: #FFFFFF;
+  --crm-danger: #B3261E;
+  --crm-danger-bg: #F9E4E2;
+  --crm-success: #2E7D4F;
+  --crm-success-bg: #E1F2E8;
+  --hover-wash: #F1EBE1;
+  --skel: #E9E2D6;
+  --shadow-card: 0 1px 2px rgba(26, 23, 18, .05);
+  --shadow-dialog: 0 12px 32px rgba(26, 23, 18, .18);
+  --backdrop: rgba(26, 23, 18, .42);
+  --sidebar-w: 240px;
+  --topbar-h: 56px;
+  --tabbar-h: 64px;
+  --font: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+
+html[data-host="dark"] #crmMount {
+  --paper: #0C0A09;
+  --surface: #17130F;
+  --ink: #F2E9DC;
+  --ink-soft: #C9B8A6;
+  --ink-mute: #8D7F70;
+  --border: rgba(242, 233, 220, .12);
+  --border-strong: rgba(242, 233, 220, .26);
+  --crm-accent: #E8731A;
+  --crm-accent-press: #C75E12;
+  --crm-accent-tint: rgba(232, 115, 26, .16);
+  --crm-accent-text-on: #0C0A09;
+  --crm-danger: #FF6B4A;
+  --crm-danger-bg: rgba(255, 74, 42, .14);
+  --crm-success: #6FCF97;
+  --crm-success-bg: rgba(111, 207, 151, .14);
+  --hover-wash: rgba(242, 233, 220, .05);
+  --skel: rgba(242, 233, 220, .09);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow-dialog: 0 12px 32px rgba(0, 0, 0, .55);
+  --backdrop: rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+
+/* ------------------------------- base -------------------------------- */
+
+
+#crmMount {
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+.num { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); }
+
+#crmMount h1 { font-size: 24px; line-height: 32px; font-weight: 600; }
+#crmMount h2 { font-size: 18px; line-height: 26px; font-weight: 600; }
+#crmMount h3 { font-size: 15px; line-height: 21px; font-weight: 600; }
+
+#crmMount a { color: var(--crm-accent); text-decoration: none; }
+#crmMount a:hover { text-decoration: underline; }
+
+#crmMount button { font: inherit; color: inherit; cursor: pointer; background: none; border: none; }
+
+#crmMount input, #crmMount select, #crmMount textarea { font: inherit; color: inherit; }
+
+#crmMount :focus-visible { outline: 2px solid var(--crm-accent); outline-offset: 2px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--surface); padding: 10px 16px; border-radius: 0 0 6px 0;
+  box-shadow: var(--shadow-card); font-weight: 500;
+}
+.skip:focus { left: 0; }
+
+/* ------------------------------- shell ------------------------------- */
+
+.app { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: var(--sidebar-w);
+  flex: 0 0 var(--sidebar-w);
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 14px 14px;
+}
+
+.brand {
+  font-size: 15px; line-height: 20px; font-weight: 600;
+  padding: 4px 10px 16px; letter-spacing: .01em;
+}
+.brand .mark { color: var(--crm-accent); }
+
+.btn-new { margin: 0 4px 14px; width: calc(100% - 8px); }
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav .it, .side-bottom .it {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; min-height: 38px;
+  border-radius: 6px; font-size: 14px; font-weight: 500;
+  color: var(--ink-soft); text-decoration: none; width: 100%; text-align: left;
+}
+.nav .it:hover, .side-bottom .it:hover { background: var(--hover-wash); text-decoration: none; }
+.nav .it.active { background: var(--crm-accent-tint); color: var(--crm-accent); font-weight: 600; }
+.side-bottom { margin-top: auto; border-top: 1px solid var(--border); padding-top: 8px; }
+
+.main-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.topbar {
+  height: var(--topbar-h);
+  display: none; align-items: center; gap: 12px;
+  padding: 0 16px;
+  position: sticky; top: 0; z-index: 30;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.topbar .tbrand { font-weight: 600; font-size: 15px; }
+.topbar .sp { flex: 1; }
+.iconbtn {
+  width: 40px; height: 40px; border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 20px; line-height: 1; color: var(--ink-soft);
+}
+.iconbtn:hover { background: var(--hover-wash); }
+
+.tabbar {
+  height: var(--tabbar-h);
+  display: none;
+  position: sticky; bottom: 0; z-index: 30;
+  background: var(--surface); border-top: 1px solid var(--border);
+  align-items: stretch; padding-bottom: env(safe-area-inset-bottom);
+}
+.tabbar .ti {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; font-size: 11px; font-weight: 500; color: var(--ink-mute);
+  min-height: 44px;
+}
+.tabbar .ti .tico { font-size: 20px; line-height: 1; }
+.tabbar .ti.active { color: var(--crm-accent); }
+.tabbar .plus {
+  flex: 0 0 64px; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: var(--crm-accent); font-weight: 500;
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 32px 96px;
+}
+
+/* ---------------------------- quick add ------------------------------ */
+
+.qamenu-wrap { position: relative; }
+.qamenu {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 50;
+  min-width: 190px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: var(--shadow-dialog);
+  padding: 6px; display: none;
+}
+.qamenu.menu-r { left: auto; right: 0; }
+.qamenu.open { display: block; }
+.qamenu .mi {
+  display: block; width: 100%; text-align: left;
+  padding: 9px 12px; border-radius: 6px; font-size: 14px; font-weight: 500;
+}
+.qamenu .mi:hover { background: var(--hover-wash); }
+
+/* ------------------------------ page bar ----------------------------- */
+
+.bar {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.bar .meta { font-size: 12px; line-height: 16px; color: var(--ink-mute); }
+.bar .sp { flex: 1; }
+.bar .actions { display: flex; gap: 10px; align-items: center; }
+
+.crumbs { font-size: 13px; color: var(--ink-mute); margin-bottom: 8px; }
+.crumbs a { color: var(--ink-mute); }
+.crumbs a:hover { color: var(--crm-accent); }
+.crumbs .sep { margin: 0 6px; }
+
+/* ------------------------------- cards ------------------------------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.card .ct {
+  font-size: 15px; font-weight: 600; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.card .ct .meta { font-size: 12px; font-weight: 400; color: var(--ink-mute); }
+.card .ct .sp { flex: 1; }
+
+.row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+}
+.card .row:first-of-type, .card .rows .row:first-of-type { border-top: none; }
+.row .sp { flex: 1; }
+.row .rd { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row .rmeta { font-size: 12px; color: var(--ink-mute); }
+
+/* ------------------------------ buttons ------------------------------ */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 16px;
+  border-radius: 6px;
+  font-size: 14px; font-weight: 500; line-height: 1;
+  border: 1px solid transparent;
+  transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+
+.btn.primary { background: var(--crm-accent); color: var(--crm-accent-text-on); }
+.btn.primary:hover:not(:disabled) { background: var(--crm-accent-press); }
+
+.btn.secondary { background: var(--surface); border-color: var(--border-strong); color: var(--ink); }
+.btn.secondary:hover:not(:disabled) { background: var(--hover-wash); }
+
+.btn.ghost { color: var(--ink-soft); }
+.btn.ghost:hover:not(:disabled) { background: var(--crm-accent-tint); color: var(--crm-accent); }
+
+.btn.danger { background: var(--crm-danger); color: #fff; }
+.btn.danger:hover:not(:disabled) { filter: brightness(.92); }
+.btn.danger-ghost { color: var(--crm-danger); }
+.btn.danger-ghost:hover:not(:disabled) { background: var(--crm-danger-bg); }
+
+.btn.sm { height: 32px; padding: 0 12px; font-size: 13px; }
+.btn.full { width: 100%; }
+.btn.text { height: auto; padding: 2px 4px; font-size: 13px; font-weight: 500; }
+
+.spinner {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid currentColor; border-top-color: transparent;
+  animation: spin 700ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ------------------------------- forms ------------------------------- */
+
+.form-col { max-width: 560px; }
+.form-col.wide { max-width: 640px; }
+.form-col.settings { max-width: 720px; }
+
+.sec-t {
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--ink-mute); margin: 22px 0 12px;
+}
+.sec-t:first-child { margin-top: 0; }
+
+.field { margin-bottom: 16px; }
+.field .lr { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.field label { font-size: 13.5px; font-weight: 500; }
+.field label .req { color: var(--crm-danger); font-weight: 600; }
+.field .counter { font-size: 12px; color: var(--ink-mute); }
+.field .counter.warn { color: var(--crm-danger); }
+
+.inp, select.inp, textarea.inp {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-size: 15px; line-height: 22px;
+}
+textarea.inp { height: auto; min-height: 64px; padding: 9px 12px; resize: vertical; }
+.inp::placeholder { color: var(--ink-mute); opacity: .8; }
+.inp.invalid { border-color: var(--crm-danger); }
+.inp[readonly] { background: var(--hover-wash); color: var(--ink-mute); }
+
+select.inp { appearance: none; background-image: none; padding-right: 30px; }
+.selectwrap { position: relative; }
+.selectwrap::after {
+  content: ''; position: absolute; right: 13px; top: 50%; width: 8px; height: 8px;
+  border-right: 1.5px solid var(--ink-soft); border-bottom: 1.5px solid var(--ink-soft);
+  transform: translateY(-70%) rotate(45deg); pointer-events: none;
+}
+
+.curwrap { position: relative; }
+.curwrap > .cur {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-mute); font-size: 14px; pointer-events: none;
+}
+.curwrap .inp { padding-left: 26px; }
+.inp.total-override { border-bottom: 2px solid var(--crm-accent); }
+
+.errmsg { font-size: 12px; line-height: 16px; color: var(--crm-danger); margin-top: 5px; }
+.hint { font-size: 12px; line-height: 16px; color: var(--ink-mute); margin-top: 5px; }
+
+.lockrow {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  background: var(--hover-wash);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px; margin-bottom: 16px;
+  font-size: 14px;
+}
+.lockrow .lk { font-size: 12px; color: var(--ink-mute); }
+
+.fieldgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.fieldgrid .field { margin-bottom: 16px; }
+
+.formfoot {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 24px; padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.formfoot .sp { flex: 1; }
+
+.savbar {
+  position: fixed; left: var(--sidebar-w); right: 0; bottom: 0; z-index: 40;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 16px rgba(26, 23, 18, .08);
+  padding: 12px 32px;
+  font-size: 14px;
+}
+.savbar .sp { flex: 1; }
+.savbar[hidden] { display: none; }
+
+/* ------------------------------ search ------------------------------- */
+
+.search {
+  position: relative; margin-bottom: 16px;
+}
+.search .inp { height: 40px; padding-left: 38px; }
+.search .sicon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-mute); font-size: 15px; pointer-events: none;
+}
+.search .clear {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--ink-soft); font-size: 16px;
+}
+.search .clear:hover { background: var(--hover-wash); }
+
+/* ------------------------------- table ------------------------------- */
+
+.tbl-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  overflow-x: auto;
+}
+table.tbl { width: 100%; border-collapse: collapse; min-width: 640px; }
+.tbl thead th {
+  font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .03em;
+  color: var(--ink-mute);
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.tbl thead th .sortbtn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit;
+  padding: 2px 4px; margin: -2px -4px; border-radius: 4px;
+}
+.tbl thead th .sortbtn:hover { color: var(--ink); background: var(--hover-wash); }
+.tbl thead th .arr { font-size: 10px; }
+.tbl tbody td {
+  padding: 10px 16px;
+  font-size: 14px; line-height: 20px;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+.tbl tbody tr:first-child td { border-top: none; }
+.tbl tbody tr.rowlink { cursor: pointer; }
+.tbl tbody tr.rowlink:hover td { background: var(--hover-wash); }
+.tbl tbody tr.rowlink:focus-visible { outline: 2px solid var(--crm-accent); outline-offset: -2px; }
+.tbl tbody tr.rowlink.active td { background: var(--crm-accent-tint); }
+.tbl .sub { font-size: 12px; color: var(--ink-mute); }
+.tbl .cellnum { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbl .dash { color: var(--ink-mute); }
+
+.pager {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 12px; font-size: 12px; color: var(--ink-mute);
+}
+.pager .sp { flex: 1; }
+
+/* mobile card stack (customer list) */
+.cstack { display: none; }
+.mcard {
+  display: block; width: 100%; text-align: left;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  padding: 12px 14px; margin-bottom: 10px;
+  font-size: 14px;
+}
+.mcard:hover { border-color: var(--border-strong); }
+.mcard .t { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.mcard .s { font-size: 13px; color: var(--ink-soft); margin-top: 3px; }
+.mcard .chev { margin-left: auto; color: var(--ink-mute); }
+
+/* ------------------------------- chips ------------------------------- */
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 2px 10px 2px 8px;
+  border-radius: 999px;
+  font-size: 12px; font-weight: 500; line-height: 18px;
+  white-space: nowrap;
+  color: var(--c, var(--ink-soft));
+  background: var(--cbg, var(--hover-wash));
+  border: 1px solid var(--cborder, var(--border));
+}
+.chip .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: currentColor;
+}
+.chip.selectable { cursor: pointer; }
+
+.plate {
+  display: inline-block;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .05em;
+  padding: 1px 7px;
+  border: 1px solid var(--border-strong); border-radius: 4px;
+  background: var(--surface);
+  text-transform: uppercase; white-space: nowrap;
+}
+
+/* --------------------------- vehicles, tl ---------------------------- */
+
+.vgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.vcard {
+  display: block; text-align: left; width: 100%;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  padding: 14px 16px;
+  font-size: 14px;
+  transition: border-color 120ms ease-out;
+}
+.vcard:hover { border-color: var(--crm-accent); }
+.vcard .vn { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.vcard .vm { font-size: 13px; color: var(--ink-soft); margin-top: 3px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.vcard .vm .meta { font-size: 12px; color: var(--ink-mute); }
+
+.tl .yhead {
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--ink-mute);
+  margin: 14px 0 4px;
+}
+.tl .yhead:first-child { margin-top: 4px; }
+.te {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto auto;
+  gap: 12px; align-items: baseline;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+}
+.te:first-child { border-top: none; }
+.te .d { font-variant-numeric: tabular-nums; font-size: 14px; color: var(--ink-soft); }
+.te .sum { font-size: 15px; min-width: 0; overflow-wrap: anywhere; }
+.te .sub { font-size: 12px; color: var(--ink-mute); margin-top: 2px; }
+.te .tot { font-variant-numeric: tabular-nums; font-size: 14px; white-space: nowrap; }
+.te .exp { font-size: 12px; color: var(--ink-mute); white-space: nowrap; }
+.te .tlx {
+  grid-column: 1 / -1;
+  display: grid; grid-template-rows: 0fr; transition: grid-template-rows 150ms ease-out;
+}
+.te.open .tlx { grid-template-rows: 1fr; }
+.te .tlx > div { overflow: hidden; }
+.te .detail {
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--hover-wash);
+  padding: 12px 14px; margin-top: 4px;
+  font-size: 13.5px;
+}
+.te .detail .kv { display: grid; grid-template-columns: 120px 1fr; gap: 4px 12px; }
+.te .detail .kv .k { color: var(--ink-mute); }
+.te .detail .notes { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+
+.kv { display: grid; grid-template-columns: 140px 1fr; gap: 6px 16px; font-size: 14px; }
+.kv .k { color: var(--ink-mute); }
+.kv .v { overflow-wrap: anywhere; }
+
+/* ------------------------- empty / error / skel ---------------------- */
+
+.empty {
+  text-align: center;
+  padding: 56px 24px;
+}
+.empty svg { margin-bottom: 14px; }
+.empty .et { font-size: 15px; font-weight: 600; }
+.empty .eb { font-size: 14px; color: var(--ink-soft); margin: 4px 0 16px; }
+.empty .row { justify-content: center; border-top: none; gap: 12px; }
+
+.empty.muted {
+  padding: 10px 0; font-size: 14px; color: var(--ink-mute);
+}
+
+.banner {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--crm-danger-bg);
+  border: 1px solid var(--crm-danger);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.banner .bt { font-weight: 600; }
+.banner .bd { color: var(--ink-soft); flex-basis: 100%; }
+.banner .sp { flex: 1; }
+.banner.block { padding: 24px; justify-content: center; text-align: center; }
+.banner.inline { margin: 0 0 16px; }
+
+.skel {
+  background: var(--skel); border-radius: 6px;
+  animation: skelin 200ms ease-out both;
+}
+@keyframes skelin { from { opacity: 0; } to { opacity: 1; } }
+.skel.shimmer { background-image: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); background-size: 200% 100%; animation: skelin 200ms ease-out both, shimmer 1.2s ease-out infinite; }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+html[data-host="dark"] .skel.shimmer { background-image: linear-gradient(90deg, transparent, rgba(242,233,220,.08), transparent); }
+
+.skel-list { display: flex; flex-direction: column; gap: 12px; }
+.skel-line { height: 14px; }
+.skel-line.h24 { height: 24px; width: 40%; }
+.skel-line.w60 { width: 60%; }
+.skel-line.w80 { width: 80%; }
+
+/* ------------------------------ dialogs ------------------------------ */
+
+.backdrop {
+  position: fixed; inset: 0; z-index: 60;
+  background: var(--backdrop);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.dialog {
+  width: 100%; max-width: 400px;
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow-dialog);
+  padding: 20px;
+  animation: dlgin 200ms ease-out;
+}
+@keyframes dlgin { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: scale(1); } }
+.dialog h3 { margin-bottom: 8px; }
+.dialog .db { font-size: 14px; color: var(--ink-soft); }
+.dialog .db a { overflow-wrap: anywhere; }
+.dialog .bf { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+
+.drawer-backdrop { position: fixed; inset: 0; z-index: 55; background: var(--backdrop); }
+.drawer {
+  position: fixed; top: 0; bottom: 0; left: 0; z-index: 56;
+  width: 260px; max-width: 85vw;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 14px;
+  display: flex; flex-direction: column; gap: 4px;
+  animation: drawin 200ms ease-out;
+}
+@keyframes drawin { from { transform: translateX(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ------------------------------- toast ------------------------------- */
+
+.toasthost {
+  position: fixed; right: 24px; bottom: 24px; z-index: 70;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  max-width: 340px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--crm-success);
+  border-radius: 10px;
+  box-shadow: var(--shadow-dialog);
+  padding: 11px 16px;
+  font-size: 14px;
+  animation: toastin 200ms ease-out;
+}
+.toast.error { border-left-color: var(--crm-danger); }
+.toast .tt { font-weight: 600; }
+@keyframes toastin { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.toast.out { opacity: 0; transition: opacity 200ms ease-out; }
+
+/* ------------------------------ settings ----------------------------- */
+
+.setrow {
+  display: grid; grid-template-columns: 190px 1fr 70px;
+  gap: 12px; align-items: start;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+}
+.setrow:first-child { border-top: none; }
+.setrow .sk2 { font-size: 13px; color: var(--ink-soft); padding-top: 8px; }
+.setrow .inpcell { min-width: 0; }
+.setrow .inp { height: 34px; font-size: 14px; }
+.modpill {
+  display: inline-block; margin-left: 8px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .03em;
+  color: var(--crm-accent); background: var(--crm-accent-tint);
+  border-radius: 999px; padding: 1px 8px; vertical-align: 1px;
+}
+.setnote { font-size: 12.5px; color: var(--ink-mute); margin: 8px 0 4px; }
+.grouph { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-mute); padding: 10px 0 2px; }
+
+/* ---------------------------- responsive ----------------------------- */
+
+@media (max-width: 1023px) {
+  .sidebar { display: none; }
+  .topbar { display: flex; }
+  .tabbar { display: flex; }
+  .content { padding: 20px 24px calc(var(--tabbar-h) + 28px); }
+  .savbar { left: 0; bottom: var(--tabbar-h); }
+  .toasthost { right: 12px; bottom: calc(var(--tabbar-h) + 12px); align-items: center; }
+}
+
+@media (max-width: 639px) {
+  .content { padding: 16px 20px calc(var(--tabbar-h) + 28px); }
+  #crmMount h1 { font-size: 21px; }
+  .bar { margin-bottom: 14px; }
+
+  /* customer list table -> card stack */
+  .tbl-wrap { display: none; }
+  .cstack { display: block; }
+
+  /* forms */
+  .inp, select.inp, textarea.inp { height: 48px; font-size: 16px; }
+  textarea.inp { height: auto; }
+  .fieldgrid { grid-template-columns: 1fr; }
+  .formfoot { flex-direction: column-reverse; align-items: stretch; }
+  .formfoot .btn { width: 100%; }
+  .formfoot .sp { display: none; }
+  .savbar { flex-wrap: wrap; padding: 10px 16px; }
+  .savbar .sp { display: none; }
+
+  /* dialogs -> bottom sheets */
+  .backdrop { align-items: flex-end; padding: 0; }
+  .dialog { max-width: none; border-radius: 12px 12px 0 0; animation: sheetin 200ms ease-out; }
+  @keyframes sheetin { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .dialog .grab { width: 36px; height: 4px; border-radius: 2px; background: var(--border-strong); margin: 0 auto 12px; }
+
+  /* timeline: date above summary */
+  .te { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .te .d { grid-column: 1 / -1; }
+
+  .vgrid { grid-template-columns: 1fr; }
+  .setrow { grid-template-columns: 1fr; gap: 6px; }
+  .setrow .sk2 { padding-top: 0; }
+  .kv { grid-template-columns: 1fr; gap: 2px 0; }
+  .kv .k { margin-top: 6px; }
+  .toasthost { bottom: calc(var(--tabbar-h) + 8px); left: 12px; right: 12px; align-items: stretch; }
+  .toast { max-width: none; }
+}
+
+/* --------------------------- reduced motion -------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  #crmMount *, #crmMount *::before, #crmMount *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+/* ---- host integration: full-page takeover while active ---- */
+#crmMount { background: var(--paper); }
+body.crm-active #crmMount {
+  position: fixed; inset: 0; z-index: 1500;
+  overflow-y: auto; overflow-x: hidden;
+}
+body.crm-active { overflow: hidden; }
+</style>
+<!-- CRM-INTEGRATION:END:STYLE -->
 </head>
 <body>
     <h1>Pages Page(s pages pages pages)🍑</h1>
@@ -16,5 +843,3782 @@
     <a href="/np-template.html">np template</a>
     <br>
     <a href="/leafletMapTest.html">leaflet map test</a>
+    <button type="button" class="login-link" onclick="openLoginModal(event)">Request Login</button>
+    <button type="button" class="login-link" aria-label="Open the customer CRM (requires login)" onclick="if (window.__crmAuth && window.__crmAuth.read()) { window.__crmAuth.show(); } else { openLoginModal(event); }">Open CRM</button>
+
+
+    <!-- Login Request Modal -->
+    <div id="loginModalOverlay" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+        <div class="login-modal">
+            <span class="close" onclick="closeLoginModal()" aria-label="Close Login Request">&times;</span>
+            <h3 id="loginModalTitle">Request Login</h3>
+            <div id="loginPassSection">
+                <form onsubmit="requestLogin(event)">
+                    <div class="form-group">
+                        <label for="loginPassphrase">Passphrase</label>
+                        <input type="password" id="loginPassphrase" class="form-control" placeholder="Passphrase" autocomplete="off">
+                    </div>
+                    <button id="loginPassSubmit" type="submit" class="cta-button">Submit</button>
+                </form>
+            </div>
+            <div id="loginAuthSection" style="display: none;">
+                <p class="modal-note">Enter your credentials.</p>
+                <form id="loginAuthForm" onsubmit="submitAuth(event)">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" class="form-control" placeholder="Username" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Password" autocomplete="off">
+                    </div>
+                    <button id="loginAuthSubmit" type="submit" class="cta-button">Sign In</button>
+                </form>
+                <button type="button" class="login-back" onclick="backToPassphrase()">&larr; Use a different passphrase</button>
+            </div>
+            <div id="loginResponse"></div>
+        </div>
+    </div>
+
+
+    <script>
+
+
+        /**************** LOGIN REQUEST (MOCK) ****************
+         * Flow: footer link -> passphrase -> FNV-1a 32-bit ->
+         * gate API -> login form + auth URL -> auth API.
+         * The gate and the auth API are SEPARATE endpoints;
+         * the browser orchestrates both. The real gate lives at
+         * /api/gate (Pages Function, not built yet) -
+         * mockGateApi/mockAuthApi below simulate it for now.
+         */
+        // Demo-only: FNV-1a 32-bit of the test passphrase "testpass".
+        // In the real gate this value is a server-side secret (env.GATE_HASH),
+        // never present in the page.
+        const MOCK_GATE_HASH = 0xad78b138;
+
+        function fnv1a32(str) {
+            let h = 2166136261; // 0x811c9dc5
+            const bytes = new TextEncoder().encode(str); // UTF-8 bytes
+            for (const b of bytes) {
+                h ^= b;
+                h = Math.imul(h, 16777619) >>> 0;
+            }
+            return h;
+        }
+
+        const loginOverlay = document.getElementById('loginModalOverlay');
+        const loginPassSection = document.getElementById('loginPassSection');
+        const loginAuthSection = document.getElementById('loginAuthSection');
+        const loginAuthForm = document.getElementById('loginAuthForm');
+        const loginResponse = document.getElementById('loginResponse');
+
+        function openLoginModal(event) {
+            if (event) event.preventDefault();
+            loginOverlay.classList.add('open');
+            setLoginStage('pass');
+            document.getElementById('loginPassphrase').focus();
+        }
+
+        function closeLoginModal() {
+            loginOverlay.classList.remove('open');
+            setLoginStage('pass');
+            loginResponse.textContent = '';
+        }
+
+        function setLoginResponse(text, kind) {
+            loginResponse.textContent = text;
+            loginResponse.className = 'login-response' + (kind ? ' ' + kind : '');
+        }
+
+        function setLoginStage(stage) {
+            const auth = stage === 'auth';
+            loginPassSection.style.display = auth ? 'none' : 'block';
+            loginAuthSection.style.display = auth ? 'block' : 'none';
+            if (!auth) {
+                document.getElementById('loginPassphrase').value = '';
+                loginAuthForm.reset();
+                loginAuthForm.action = '';
+            }
+        }
+
+        function backToPassphrase() {
+            setLoginStage('pass');
+            setLoginResponse('', '');
+            document.getElementById('loginPassphrase').focus();
+        }
+
+        // Simulated gate API (POST /api/gate).
+        // Real version: fetch('/api/gate', { method: 'POST', body: JSON.stringify({ hash }) }).
+        // Returns the same shape the real gate will:
+        //   match: { ok: true,  authUrl: '<real auth api url>' }
+        //   no:    { ok: false, error: 'Invalid access code.' }
+        function mockGateApi(hash) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(hash === MOCK_GATE_HASH
+                        ? { ok: true, authUrl: '/api/auth' }
+                        : { ok: false, error: 'Invalid access code.' });
+                }, 400);
+            });
+        }
+
+        // Simulated auth API (the separate backend that touches the DB, not built yet).
+        // Real version: fetch(authUrl, { method: 'POST', body: JSON.stringify({ username, password }) }).
+        // Mock accepts any non-empty username/password and returns the final
+        // authenticated response (a session token would live here in the real backend).
+        function mockAuthApi(username, password) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve({ ok: true, message: 'Authenticated (mock): ' + username });
+                }, 400);
+            });
+        }
+
+        async function requestLogin(event) {
+            event.preventDefault();
+            const btn = document.getElementById('loginPassSubmit');
+            const hash = fnv1a32(document.getElementById('loginPassphrase').value);
+            btn.disabled = true;
+            btn.textContent = 'Checking...';
+            setLoginResponse('', '');
+            const res = await mockGateApi(hash);
+            btn.disabled = false;
+            btn.textContent = 'Submit';
+            if (res.ok) {
+                loginAuthForm.action = res.authUrl;
+                setLoginStage('auth');
+                document.getElementById('loginUsername').focus();
+            } else {
+                setLoginResponse(res.error, 'err');
+            }
+        }
+
+        async function submitAuth(event) {
+            event.preventDefault();
+            const btn = document.getElementById('loginAuthSubmit');
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            if (!username || !password) {
+                setLoginResponse('Please enter both username and password.', 'err');
+                return;
+            }
+            btn.disabled = true;
+            btn.textContent = 'Signing In...';
+            setLoginResponse('', '');
+            const res = await mockAuthApi(username, password);
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
+            if (res.ok) {
+                setLoginResponse(res.message, 'ok');
+            } else {
+                setLoginResponse(res.error || 'Authentication failed.', 'err');
+            }
+        }
+    </script>
+<!-- CRM-INTEGRATION:BODY (t_ec042054) -->
+<div id="crmMount" hidden></div>
+<script>
+/**
+ * llt-crm — deterministic seed data for the automotive service CRM.
+ *
+ * All values are literals: no randomness, no Date.now(). Loading the seed
+ * twice always produces identical state, so demo data, screenshots, and
+ * tests are reproducible.
+ *
+ * Shop profile: a small independent automotive service shop (test
+ * configuration per the project brief). Locations and people are fictional.
+ *
+ * Entities:
+ *   customers: 3   (c001..c003)
+ *   vehicles:  4   (v001..v004)  — 2 belong to c001
+ *   jobs:      6   (j001..j006)  — one per vehicle, plus two on v003
+ *
+ * Job money: dollars as numbers, 2 decimal places. total = labor + parts.
+ */
+const SEED = {
+  customers: [
+    {
+      id: 'c001',
+      name: 'Dana Whitfield',
+      phone: '719-555-0142',
+      email: 'dana.whitfield@example.com',
+      address: '1420 Aspen Ct, Alamosa, CO 81101',
+      notes: 'Prefers text reminders. Two vehicles on file.',
+      createdAt: '2026-06-02T16:00:00Z',
+      updatedAt: '2026-09-15T18:30:00Z',
+    },
+    {
+      id: 'c002',
+      name: 'Marcus Reyes',
+      phone: '719-555-0177',
+      email: 'm.reyes@example.com',
+      address: '88 Rio Grande Ave, Alamosa, CO 81101',
+      notes: 'County work — invoice to the PO number on file.',
+      createdAt: '2026-05-11T15:00:00Z',
+      updatedAt: '2026-09-08T20:05:00Z',
+    },
+    {
+      id: 'c003',
+      name: 'Priya Natarajan',
+      phone: '915-555-0103',
+      email: 'priya.n@example.com',
+      address: '702 Bluebird Ln, Trinidad, CO 81082',
+      notes: '',
+      createdAt: '2026-07-30T14:20:00Z',
+      updatedAt: '2026-09-23T10:05:00Z',
+    },
+  ],
+
+  vehicles: [
+    {
+      id: 'v001',
+      customerId: 'c001',
+      make: 'Subaru',
+      model: 'Outback',
+      year: 2019,
+      vin: '4S4BSANC6K3215678',
+      plate: 'COA-4821',
+      mileage: 61240,
+      createdAt: '2026-06-02T16:10:00Z',
+      updatedAt: '2026-09-15T18:35:00Z',
+    },
+    {
+      id: 'v002',
+      customerId: 'c001',
+      make: 'Toyota',
+      model: 'Tacoma',
+      year: 2015,
+      vin: '5TDJR3DC0FS044210',
+      plate: 'COB-1190',
+      mileage: 98450,
+      createdAt: '2026-06-02T16:25:00Z',
+      updatedAt: '2026-09-22T15:45:00Z',
+    },
+    {
+      id: 'v003',
+      customerId: 'c002',
+      make: 'Ford',
+      model: 'F-150',
+      year: 2011,
+      vin: '1FTFW1EF5BFA88371',
+      plate: 'COD-7734',
+      mileage: 176320,
+      createdAt: '2026-05-11T15:20:00Z',
+      updatedAt: '2026-09-08T20:10:00Z',
+    },
+    {
+      id: 'v004',
+      customerId: 'c003',
+      make: 'Chevrolet',
+      model: 'Malibu',
+      year: 2017,
+      vin: '1G11Z5SP4HF103226',
+      plate: 'COE-2249',
+      mileage: 45880,
+      createdAt: '2026-07-30T14:30:00Z',
+      updatedAt: '2026-09-23T10:05:00Z',
+    },
+  ],
+
+  jobs: [
+    {
+      id: 'j001',
+      customerId: 'c001',
+      vehicleId: 'v001',
+      date: '2026-09-15',
+      status: 'completed',
+      description: 'Oil change & tire rotation',
+      labor: 95.0,
+      parts: 62.4,
+      total: 157.4,
+      technician: 'Sam K.',
+      notes: 'Front tires swapped to rear. Oil: 5W-30, 5 qts.',
+      createdAt: '2026-09-15T16:00:00Z',
+      updatedAt: '2026-09-15T19:10:00Z',
+    },
+    {
+      id: 'j002',
+      customerId: 'c001',
+      vehicleId: 'v002',
+      date: '2026-09-22',
+      status: 'in_progress',
+      description: 'Front brake pads & rotors',
+      labor: 180.0,
+      parts: 142.75,
+      total: 322.75,
+      technician: 'Sam K.',
+      notes: 'Rear pads at ~40% — quoted separately, not yet approved.',
+      createdAt: '2026-09-22T14:20:00Z',
+      updatedAt: '2026-09-22T15:45:00Z',
+    },
+    {
+      id: 'j003',
+      customerId: 'c002',
+      vehicleId: 'v003',
+      date: '2026-09-08',
+      status: 'completed',
+      description: 'Check-engine-light diagnostics',
+      labor: 110.0,
+      parts: 0,
+      total: 110.0,
+      technician: 'Dre M.',
+      notes: 'P0420 catalyst below efficiency. Awaiting customer decision on exhaust work.',
+      createdAt: '2026-09-08T13:05:00Z',
+      updatedAt: '2026-09-08T17:40:00Z',
+    },
+    {
+      id: 'j004',
+      customerId: 'c002',
+      vehicleId: 'v003',
+      date: '2026-08-14',
+      status: 'completed',
+      description: '100k-mile service (oil, plugs, fluids)',
+      labor: 320.0,
+      parts: 218.35,
+      total: 538.35,
+      technician: 'Dre M.',
+      notes: '',
+      createdAt: '2026-08-14T12:00:00Z',
+      updatedAt: '2026-08-15T16:00:00Z',
+    },
+    {
+      id: 'j005',
+      customerId: 'c003',
+      vehicleId: 'v004',
+      date: '2026-09-23',
+      status: 'open',
+      description: 'Battery replacement',
+      labor: 25.0,
+      parts: 168.0,
+      total: 193.0,
+      technician: 'Sam K.',
+      notes: 'Customer asked to keep the old battery for the snowmobile charger.',
+      createdAt: '2026-09-23T10:00:00Z',
+      updatedAt: '2026-09-23T10:00:00Z',
+    },
+    {
+      id: 'j006',
+      customerId: 'c003',
+      vehicleId: 'v004',
+      date: '2026-07-30',
+      status: 'completed',
+      description: 'Wheel alignment & balance',
+      labor: 85.0,
+      parts: 0,
+      total: 85.0,
+      technician: 'Dre M.',
+      notes: 'Rear toe out of spec after washboard road on the way in.',
+      createdAt: '2026-07-30T14:40:00Z',
+      updatedAt: '2026-07-30T17:15:00Z',
+    },
+  ],
+
+  config: {
+    shopName: 'Example Auto Service',
+    serviceTypes: [
+      'oil_change',
+      'brakes',
+      'tires',
+      'diagnostics',
+      'battery',
+      'alignment',
+      'fluids',
+      'inspection',
+      'repair',
+    ],
+    statuses: ['open', 'in_progress', 'completed', 'cancelled'],
+    defaultStatus: 'open',
+    fieldLabels: {
+      name: 'Customer name',
+      phone: 'Phone',
+      email: 'Email',
+      address: 'Address',
+      notes: 'Notes',
+      make: 'Make',
+      model: 'Model',
+      year: 'Year',
+      vin: 'VIN',
+      plate: 'License plate',
+      mileage: 'Mileage',
+      date: 'Service date',
+      status: 'Status',
+      description: 'Description',
+      labor: 'Labor',
+      parts: 'Parts',
+      total: 'Total',
+      technician: 'Technician',
+    },
+  },
+};
+
+;
+/**
+ * llt-crm — mock backend API for a small automotive service CRM.
+ *
+ * =====================================================================
+ * QUICK START
+ * =====================================================================
+ *
+ *   Browser (the intended home — the CRM page lives behind login on
+ *   the site; all data persists in localStorage):
+ *
+ *       import { CrmApi } from './lib/api.js';
+ *       const crm = new CrmApi();          // storage: localStorage
+ *       const { customers, vehicles, jobs } = crm.seed();
+ *
+ *   Node (tests / script usage; in-memory persistence):
+ *
+ *       import { CrmApi } from './lib/api.js';
+ *       const crm = new CrmApi();          // storage: in-memory Map
+ *
+ *   The constructor also accepts { storage: <StorageLike> } and
+ *   { persist: false } — see the class docs below.
+ *
+ * =====================================================================
+ * API CONTRACT
+ * =====================================================================
+ *
+ * All operations return a PROMISE that resolves to the shape documented
+ * on the method (async-first so a real HTTP backend can be swapped in
+ * later without touching UI code). All methods reject with `ApiError`:
+ *
+ *     ApiError extends Error
+ *       .code  one of:
+ *               'not_found'      (404) requested id / entity does not exist
+ *               'validation'     (422) input failed validation (see .errors)
+ *               'conflict'       (409) referential integrity violation,
+ *                                      e.g. deleting a customer that still
+ *                                      has vehicles or jobs
+ *       .errors  { fieldName: 'message' } map, only for 'validation'
+ *
+ * Money fields (labor, parts, total) are numbers in dollars, 2 decimal
+ * places. `total` is always recomputed by the API as round(labor + parts,
+ * 2) — pass whatever you like and the stored value is canonical.
+ * Dates: `job.date` is 'YYYY-MM-DD'; createdAt/updatedAt are ISO-8601
+ * UTC ('...Z').
+ *
+ * LIST ORDER
+ *   customers.list() -> name, case-insensitive
+ *   vehicles.list()  -> id (creation order)
+ *   jobs.list()      -> date descending, then id (service-history
+ *                       order; a `?sort='date_asc'` style param is a
+ *                       later UI concern — the API exposes the
+ *                       `dir` option documented below)
+ *
+ * METHODS (each returns a Promise):
+ *   crm.seed()                       -> { customers, vehicles, jobs, config }
+ *                                      Load deterministic demo data,
+ *                                      wiping any persisted data first.
+ *                                      Runs automatically on first load
+ *                                      when no persisted data exists.
+ *   crm.reset()                      -> { cleared: true }
+ *                                      Wipe persisted data; next
+ *                                      auto-load re-seeds.
+ *
+ *   crm.getCustomers(opts)           -> Customer[]
+ *   crm.getCustomer(id)              -> Customer
+ *   crm.createCustomer(input)        -> Customer
+ *   crm.updateCustomer(id, input)    -> Customer
+ *   crm.deleteCustomer(id)           -> { deleted: id }
+ *
+ *   crm.getVehicles(opts)            -> Vehicle[]
+ *   crm.getVehicle(id)                -> Vehicle
+ *   crm.createVehicle(input)         -> Vehicle
+ *   crm.updateVehicle(id, input)     -> Vehicle
+ *   crm.deleteVehicle(id)            -> { deleted: id }
+ *
+ *   crm.getJobs(opts)                 -> Job[]
+ *   crm.getJob(id)                    -> Job
+ *   crm.createJob(input)              -> Job
+ *   crm.updateJob(id, input)          -> Job
+ *   crm.deleteJob(id)                 -> { deleted: id }
+ *
+ *   crm.getDashboard()                -> Dashboard summary (see below)
+ *
+ * Entity shapes:
+ *
+ *   Customer { id, name, phone, email, address, notes, createdAt, updatedAt }
+ *   Vehicle  { id, customerId, make, model, year, vin, plate, mileage,
+ *              createdAt, updatedAt }
+ *   Job      { id, customerId, vehicleId, date, status, description,
+ *              labor, parts, total, technician, notes, createdAt, updatedAt }
+ *
+ * List query options (all optional):
+ *
+ *   customers.list({ q })              q: case-insensitive substring
+ *                                       matched against name, phone, email
+ *   vehicles.list({ customerId })      filter to one customer
+ *   jobs.list({ customerId, vehicleId,
+ *                    status, q, dir })
+ *     q  -> matches description or technician
+ *     dir -> 'date_desc' (default) | 'date_asc'; ties break by id
+ *
+ * create/update input rules:
+ *   - `id` and timestamps are generated/managed by the API; sending
+ *     them is ignored.
+ *   - create: every required field must be present (see REQUIRED below);
+ *     `status` defaults to config.defaultStatus on job create when
+ *     omitted; `total` is recomputed.
+ *   - update: partial — only the fields you pass are changed. A
+ *     customer/vehicle id change on an existing job is allowed (re-
+ *     validated for existence).
+ *   - Required fields, per entity:
+ *       customer: name, phone
+ *       vehicle:  customerId, make, model, year, vin, plate
+ *       job:      customerId, vehicleId, date, description, labor, parts
+ *     Optional (default ''): customer.notes/email/address,
+ *     vehicle.mileage (default 0), job.status/technician/notes.
+ *
+ * Validation errors (rejected as ApiError code 'validation'):
+ *   - name/make/model/description: non-empty string
+ *   - phone: non-empty string
+ *   - email: RFC-5322-lite check when non-empty
+ *   - year: integer, 1900..currentYear+1
+ *   - vin: 17 chars, no I/O/Q
+ *   - plate: non-empty
+ *   - mileage: integer >= 0
+ *   - labor/parts: number >= 0 (0 allowed)
+ *   - date: 'YYYY-MM-DD' and a real calendar date
+ *   - status: must be in config.statuses
+ *   - referential: customerId / vehicleId must exist (on create and
+ *     on update), and a job's vehicle must belong to the same customer
+ *     as the job's customerId
+ *
+ * Delete rules:
+ *   - deleteCustomer: BLOCKED with 'conflict' while the customer has
+ *     vehicles or jobs (cascade is a product decision, not a mock
+ *     detail).
+ *   - deleteVehicle:  BLOCKED with 'conflict' while jobs reference it.
+ *   - deleteJob:      always allowed.
+ *
+ * Dashboard shape (getDashboard()):
+ *   {
+ *     counts: { customers, vehicles, openJobs, inProgressJobs,
+ *               completedJobs, cancelledJobs },
+ *     recentJobs: Job[]          // last 5, date desc, then id
+ *     upcoming:   Job[]          // status 'open' AND date >= today,
+ *                                 // date asc, then id
+ *     monthRevenue: { month: 'YYYY-MM', total: number }
+ *                                // sum of totals of jobs dated in the
+ *                                // current UTC month
+ *   }
+ */
+
+
+
+class ApiError extends Error {
+  /**
+   * @param {string} code 'not_found' | 'validation' | 'conflict'
+   * @param {string} message
+   * @param {Object<string,string>} [errors] field-level messages, validation only
+   */
+  constructor(code, message, errors) {
+    super(message);
+    this.name = 'ApiError';
+    this.code = code;
+    this.errors = errors || null;
+  }
+}
+
+const STORAGE_KEY = 'llt_crm_v1';
+const ENTITIES = ['customers', 'vehicles', 'jobs', 'config'];
+const REQUIRED = {
+  customer: ['name', 'phone'],
+  vehicle: ['customerId', 'make', 'model', 'year', 'vin', 'plate'],
+  job: ['customerId', 'vehicleId', 'date', 'description', 'labor', 'parts'],
+};
+const OPTIONAL_DEFAULTS = {
+  customer: { email: '', address: '', notes: '' },
+  vehicle: { mileage: 0 },
+  job: { status: null, technician: '', notes: '' }, // status: config default
+};
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/* ----------------------------- storage layer ----------------------------- */
+
+/** In-memory Storage lookalike (same shape as window.localStorage). */
+class MemoryStorage {
+  constructor() {
+    this.map = new Map();
+  }
+  getItem(k) {
+    return this.map.has(k) ? this.map.get(k) : null;
+  }
+  setItem(k, v) {
+    this.map.set(k, String(v));
+  }
+  removeItem(k) {
+    this.map.delete(k);
+  }
+  clear() {
+    this.map.clear();
+  }
+}
+
+/**
+ * localStorage-backed storage; safe to construct on Node (no browser
+ * APIs touched until an operation runs, and operations guard with a
+ * capability check) — but in Node you want MemoryStorage instead.
+ */
+class LocalStorageBackend {
+  get() {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      // Corrupt payload: treat as empty so the app can re-seed.
+      return null;
+    }
+  }
+  set(db) {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  }
+  clear() {
+    window.localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+/* --------------------------------- utils --------------------------------- */
+
+const isPlainObject = (v) =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
+const isInt = (v) => Number.isInteger(v);
+const clampMoney = (v) => Math.round(v * 100) / 100;
+const isoNow = () => new Date().toISOString();
+const todayUtc = () => isoNow().slice(0, 10);
+const byNameI = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+
+/** Minimal deep clone for seed/record copies (no functions, no cycles). */
+const clone = (v) => JSON.parse(JSON.stringify(v));
+
+/* ------------------------------ validation ------------------------------- */
+
+function validateEntity(kind, data, { forUpdate = false } = {}) {
+  const errors = {};
+  const missing = [];
+
+  const required = forUpdate
+    ? []
+    : REQUIRED[kind].filter((f) => !(kind === 'job' && f === 'status'));
+
+  const present = (f) => {
+    const v = data[f];
+    if (v === undefined || v === null || v === '') missing.push(f);
+    return !missing.includes(f);
+  };
+  const isNumish = (v) => typeof v === 'number' && Number.isFinite(v);
+
+  required.forEach((f) => {
+    if (!present(f)) {
+      errors[f] = `${f} is required`;
+      return;
+    }
+    const v = data[f];
+    const bad =
+      (f === 'year' || f === 'mileage' || f === 'labor' || f === 'parts'
+        ? !isNumish(v)
+        : f === 'status'
+          ? typeof v !== 'string' || !v
+          : typeof v !== 'string' || v.trim() === '');
+    if (bad) errors[f] = `${f} has an invalid type or is missing`;
+  });
+  if (missing.length) errors._required = missing.join(', ');
+
+  // Field-specific rules (only for values that passed the type gate).
+  if (kind === 'customer') {
+    if (typeof data.email === 'string' && data.email !== '' && !EMAIL_RE.test(data.email))
+      errors.email = 'email is not a valid address';
+  }
+  if (kind === 'vehicle') {
+    if (isInt(data.year) && (data.year < 1900 || data.year > new Date().getFullYear() + 1))
+      errors.year = `year must be 1900..${new Date().getFullYear() + 1}`;
+    if (typeof data.vin === 'string' && data.vin !== '' && !/^[A-HJ-NPR-Z0-9]{17}$/i.test(data.vin))
+      errors.vin = 'vin must be 17 characters, letters (no I, O, Q) and digits';
+    if (isInt(data.mileage) && data.mileage < 0) errors.mileage = 'mileage must be >= 0';
+    if (present('mileage') && !isInt(data.mileage)) errors.mileage = 'mileage must be a whole number';
+  }
+  if (kind === 'job') {
+    if (typeof data.date === 'string' && data.date !== '' && !validDate(data.date))
+      errors.date = 'date must be a real YYYY-MM-DD calendar date';
+    if (present('date') && (typeof data.date !== 'string' || !DATE_RE.test(data.date)))
+      errors.date = 'date must be a YYYY-MM-DD string';
+    for (const f of ['labor', 'parts']) {
+      if (present(f)) {
+        if (typeof data[f] !== 'number' || !Number.isFinite(data[f])) errors[f] = `${f} must be a number`;
+        else if (data[f] < 0) errors[f] = `${f} must be >= 0`;
+      }
+    }
+  }
+  return errors;
+}
+
+function validDate(s) {
+  if (!DATE_RE.test(s)) return false;
+  const [y, m, d] = s.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
+}
+
+/* ---------------------------------- api ---------------------------------- */
+
+class CrmApi {
+  /**
+   * @param {object} [options]
+   * @param {StorageLike} [options.storage]  In-memory or any localStorage-
+   *   shaped object. Default: window.localStorage in browsers,
+   *   MemoryStorage on Node.
+   * @param {boolean} [options.persist]      false = never write to storage
+   *   (purely in-memory session; seed auto-load still applies).
+   * @param {() => string} [options.now]     Injectable clock, ISO string.
+   *   Used for timestamps, dashboard 'today', and year validation bounds.
+   *   Tests pass a fixed clock for determinism.
+   */
+  constructor(options = {}) {
+    const inBrowser = typeof window !== 'undefined' && !!window.localStorage;
+    if (options.storage) this.storage = options.storage;
+    else if (inBrowser) this.storage = new LocalStorageBackend();
+    else this.storage = new MemoryStorage();
+    this.persist = options.persist !== false && (inBrowser || !!options.storage);
+    this.clock = options.now || isoNow;
+    this._db = null;
+  }
+
+  /* ------------------------------ lifecycle ------------------------------ */
+
+  _load() {
+    if (this._db) return this._db;
+    const raw = this._read();
+    if (raw && this._dbShapeOk(raw)) {
+      this._db = raw;
+    } else {
+      this._db = this._freshDb(); // first run: deterministic seed
+      this._write();
+    }
+    return this._db;
+  }
+
+  _read() {
+    try {
+      if (this.storage instanceof LocalStorageBackend) return this.storage.get();
+      const raw = this.storage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  _write() {
+    if (this.persist) {
+      try {
+        if (this.storage instanceof LocalStorageBackend) this.storage.set(this._db);
+        else this.storage.setItem(STORAGE_KEY, JSON.stringify(this._db));
+      } catch (e) {
+        console.warn('llt-crm: persist failed (continuing in-memory)', e);
+      }
+    }
+  }
+
+  _freshDb() {
+    return clone(SEED);
+  }
+
+  _dbShapeOk(db) {
+    return (
+      isPlainObject(db) &&
+      ENTITIES.every((k) => Array.isArray(db[k]) || k === 'config') &&
+      Array.isArray(db.customers) &&
+      Array.isArray(db.vehicles) &&
+      Array.isArray(db.jobs)
+    );
+  }
+
+  _fail(code, message, errors) {
+    throw new ApiError(code, message, errors);
+  }
+
+  /** Load the deterministic seed, wiping any persisted data first. */
+  async seed() {
+    this._db = this._freshDb();
+    this._write();
+    return clone(this._db);
+  }
+
+  /** Wipe persisted data; the next load re-seeds. */
+  async reset() {
+    this._db = null;
+    if (this.storage instanceof LocalStorageBackend) this.storage.clear();
+    else this.storage.removeItem(STORAGE_KEY);
+    this._load(); // re-seed immediately so the app keeps working
+    return { cleared: true };
+  }
+
+  /* ------------------------------ helpers ------------------------------- */
+
+  _col(name) {
+    return this._load()[name];
+  }
+
+  _get(col, id) {
+    const rec = this._col(col).find((r) => r.id === id);
+    if (!rec) this._fail('not_found', `${col} ${id} not found`);
+    return rec;
+  }
+
+  _findIndex(col, id) {
+    return this._col(col).findIndex((r) => r.id === id);
+  }
+
+  _nextId(col, prefix) {
+    const max = this._col(col).reduce((m, r) => Math.max(m, Number(String(r.id).slice(prefix.length)) || 0), 0);
+    return `${prefix}${String(max + 1).padStart(3, '0')}`;
+  }
+
+  _apply(col, kind, input, id) {
+    const data = { ...input };
+    delete data.id;
+    delete data.createdAt;
+    delete data.updatedAt;
+    delete data.total; // recomputed, never trusted
+    const errors = validateEntity(kind, data, { forUpdate: !!id });
+    if (Object.keys(errors).length) this._fail('validation', 'Invalid input', errors);
+
+    // Referential checks.
+    if (kind === 'vehicle' && 'customerId' in data)
+      this._get('customers', data.customerId);
+    if (kind === 'job') {
+      const customerId = 'customerId' in data ? data.customerId : this._get('jobs', id).customerId;
+      const vehicleId = 'vehicleId' in data ? data.vehicleId : this._get('jobs', id).vehicleId;
+      const customer = this._get('customers', customerId);
+      const vehicle = this._get('vehicles', vehicleId);
+      if (vehicle.customerId !== customer.id)
+        this._fail(
+          'validation',
+          'job vehicle does not belong to the job customer',
+          { vehicleId: `vehicle ${vehicleId} belongs to customer ${vehicle.customerId}, not ${customer.id}` }
+        );
+    }
+    // Status check (create default + update).
+    if (kind === 'job') {
+      const status = 'status' in data ? data.status : null;
+      if (status !== null && !this._load().config.statuses.includes(status))
+        this._fail('validation', `status must be one of: ${this._load().config.statuses.join(', ')}`, {
+          status: 'unknown status',
+        });
+    }
+
+    const now = this.clock();
+    if (id) {
+      const rec = this._get(col, id);
+      Object.assign(rec, data, { updatedAt: now });
+      if (kind === 'job') rec.total = clampMoney(rec.labor + rec.parts);
+      return rec;
+    }
+    const rec = {
+      ...(kind === 'customer'
+        ? { name: data.name, phone: data.phone, email: data.email ?? '', address: data.address ?? '', notes: data.notes ?? '' }
+        : kind === 'vehicle'
+          ? { customerId: data.customerId, make: data.make, model: data.model, year: data.year, vin: data.vin, plate: data.plate, mileage: data.mileage ?? 0 }
+          : {
+              customerId: data.customerId,
+              vehicleId: data.vehicleId,
+              date: data.date,
+              status: data.status ?? this._load().config.defaultStatus,
+              description: data.description,
+              labor: clampMoney(data.labor),
+              parts: clampMoney(data.parts),
+              total: 0,
+              technician: data.technician ?? '',
+              notes: data.notes ?? '',
+            }),
+      createdAt: now,
+      updatedAt: now,
+    };
+    if (kind === 'job') rec.total = clampMoney(rec.labor + rec.parts);
+    rec.id = this._nextId(col, kind === 'customer' ? 'c' : kind === 'vehicle' ? 'v' : 'j');
+    // Keep ids stable: assign before any later validation that needs them.
+    this._col(col).push(rec);
+    return rec;
+  }
+
+  _delete(col, kind, id) {
+    const db = this._load();
+    if (this._findIndex(col, id) === -1) this._fail('not_found', `${col} ${id} not found`);
+    if (kind === 'customer') {
+      const vehicles = db.vehicles.filter((v) => v.customerId === id).length;
+      const jobs = db.jobs.filter((j) => j.customerId === id).length;
+      if (vehicles || jobs)
+        this._fail(
+          'conflict',
+          `customer ${id} still has ${vehicles} vehicle(s) and ${jobs} job(s); delete or reassign them first`
+        );
+    }
+    if (kind === 'vehicle') {
+      const jobs = db.jobs.filter((j) => j.vehicleId === id).length;
+      if (jobs)
+        this._fail('conflict', `vehicle ${id} still has ${jobs} job(s); delete or reassign them first`);
+    }
+    const arr = db[col];
+    arr.splice(arr.findIndex((r) => r.id === id), 1);
+    this._write();
+    return { deleted: id };
+  }
+
+  /* ------------------------------ customers ------------------------------ */
+
+  async getCustomers(opts = {}) {
+    let rows = clone(this._load().customers);
+    if (opts.q) {
+      const q = String(opts.q).toLowerCase();
+      rows = rows.filter(
+        (c) => c.name.toLowerCase().includes(q) || c.phone.includes(q) || c.email.toLowerCase().includes(q)
+      );
+    }
+    return rows.sort(byNameI);
+  }
+
+  async getCustomer(id) {
+    return clone(this._get('customers', id));
+  }
+
+  async createCustomer(input) {
+    const rec = this._apply('customers', 'customer', input, null);
+    this._write();
+    return clone(rec);
+  }
+
+  async updateCustomer(id, input) {
+    this._apply('customers', 'customer', input, id);
+    this._write();
+    return clone(this._get('customers', id));
+  }
+
+  async deleteCustomer(id) {
+    this._delete('customers', 'customer', id);
+    return { deleted: id };
+  }
+
+  /* ------------------------------- vehicles ------------------------------ */
+
+  async getVehicles(opts = {}) {
+    let rows = clone(this._load().vehicles);
+    if (opts.customerId) rows = rows.filter((v) => v.customerId === opts.customerId);
+    return rows; // id order == creation order
+  }
+
+  async getVehicle(id) {
+    return clone(this._get('vehicles', id));
+  }
+
+  async createVehicle(input) {
+    const rec = this._apply('vehicles', 'vehicle', input, null);
+    this._write();
+    return clone(rec);
+  }
+
+  async updateVehicle(id, input) {
+    this._apply('vehicles', 'vehicle', input, id);
+    this._write();
+    return clone(this._get('vehicles', id));
+  }
+
+  async deleteVehicle(id) {
+    this._delete('vehicles', 'vehicle', id);
+    return { deleted: id };
+  }
+
+  /* --------------------------------- jobs -------------------------------- */
+
+  async getJobs(opts = {}) {
+    let rows = clone(this._load().jobs);
+    if (opts.customerId) rows = rows.filter((j) => j.customerId === opts.customerId);
+    if (opts.vehicleId) rows = rows.filter((j) => j.vehicleId === opts.vehicleId);
+    if (opts.status) rows = rows.filter((j) => j.status === opts.status);
+    if (opts.q) {
+      const q = String(opts.q).toLowerCase();
+      rows = rows.filter((j) => j.description.toLowerCase().includes(q) || j.technician.toLowerCase().includes(q));
+    }
+    const dir = opts.dir === 'date_asc' ? 1 : -1;
+    rows.sort((a, b) => (a.date === b.date ? (a.id < b.id ? -1 : 1) : a.date < b.date ? -dir : dir));
+    return rows;
+  }
+
+  async getJob(id) {
+    return clone(this._get('jobs', id));
+  }
+
+  async createJob(input) {
+    const rec = this._apply('jobs', 'job', input, null);
+    this._write();
+    return clone(rec);
+  }
+
+  async updateJob(id, input) {
+    this._apply('jobs', 'job', input, id);
+    this._write();
+    return clone(this._get('jobs', id));
+  }
+
+  async deleteJob(id) {
+    this._delete('jobs', 'job', id);
+    return { deleted: id };
+  }
+
+  /* ------------------------------- dashboard ----------------------------- */
+
+  async getDashboard() {
+    const db = this._load();
+    const today = this.clock().slice(0, 10);
+    const counts = { customers: db.customers.length, vehicles: db.vehicles.length };
+    for (const s of db.config.statuses) counts[statusCountKey(s)] = 0;
+    for (const j of db.jobs) counts[statusCountKey(j.status)]++;
+
+    const recentJobs = (await this.getJobs({ dir: 'date_desc' })).slice(0, 5);
+    const upcoming = (await this.getJobs({ status: 'open', dir: 'date_asc' })).filter((j) => j.date >= today);
+    const month = today.slice(0, 7);
+    const monthRevenue = {
+      month,
+      total: clampMoney(db.jobs.filter((j) => j.date.startsWith(month)).reduce((s, j) => s + j.total, 0)),
+    };
+    return { counts, recentJobs, upcoming, monthRevenue };
+  }
+}
+
+const statusCountKey = (s) =>
+  ({
+    open: 'openJobs',
+    in_progress: 'inProgressJobs',
+    completed: 'completedJobs',
+    cancelled: 'cancelledJobs',
+  })[s] || `${s}Jobs`;
+</script>
+<script>
+/* ===== CRM app (integrated build; mounts inside #crmMount) ===== */
+(function () {
+window.__crmBooted = false;
+/* ============================================================
+   llt-crm — app core
+   utils · config overlay · shell · dialogs · toasts · router ·
+   form infrastructure. Screens live in app-screens.js.
+
+   Config architecture (see README "UI" notes):
+   - lib/api.js exposes config READ-ONLY (no config-write method)
+     and Job has no serviceType column. The configurability
+     surface of the design spec (labels, service types, custom
+     statuses, per-job extras) therefore lives in a client-side
+     overlay (localStorage key llt_crm_overlay_v1) that sits on
+     top of the read-only backend. The UI never mutates the
+     backend's stored config, and only ever sends the backend
+     its legal coarse statuses (open / in_progress / completed /
+     cancelled) — rich statuses are an overlay concern.
+   ============================================================ */
+'use strict';
+
+/* ------------------------------ utils ------------------------------ */
+
+function crmExit(e) { if (e) e.preventDefault(); if (window.__crmAuth && window.__crmAuth.hide) window.__crmAuth.hide(); }
+function crmLogout(e) { if (e) e.preventDefault(); if (window.__crmAuth && window.__crmAuth.logout) window.__crmAuth.logout(); }
+
+const U = {
+  el(tag, attrs, ...kids) {
+    const n = document.createElement(tag);
+    if (attrs) {
+      for (const [k, v] of Object.entries(attrs)) {
+        if (v === false || v === null || v === undefined) continue;
+        if (k === 'class') n.className = v;
+        else if (k === 'html') n.innerHTML = v;
+        else if (k === 'text') n.textContent = v;
+        else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
+        else if (v === true) n.setAttribute(k, '');
+        else n.setAttribute(k, String(v));
+      }
+    }
+    for (const kid of kids.flat(Infinity)) {
+      if (kid === null || kid === undefined || kid === false) continue;
+      n.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+    return n;
+  },
+  frag(...kids) {
+    const f = document.createDocumentFragment();
+    for (const kid of kids.flat(Infinity)) {
+      if (kid === null || kid === undefined || kid === false) continue;
+      f.append(kid.nodeType ? kid : document.createTextNode(kid));
+    }
+    return f;
+  },
+  esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  },
+  debounce(fn, ms) {
+    let t;
+    return (...a) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...a), ms);
+    };
+  },
+  money(n) {
+    return '$' + Number(n || 0).toFixed(2);
+  },
+  int(n) {
+    return Number(n || 0).toLocaleString('en-US');
+  },
+  parseDate(s) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s || '')) return null;
+    const [y, m, d] = s.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d ? dt : null;
+  },
+  todayISO() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  },
+  addDaysISO(iso, days) {
+    const d = U.parseDate(iso) || new Date();
+    d.setDate(d.getDate() + days);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  },
+  daysBetween(aISO, bISO) {
+    const a = U.parseDate(aISO), b = U.parseDate(bISO);
+    if (!a || !b) return 0;
+    return Math.round((b - a) / 86400000);
+  },
+  /* "Sep 26" for the current year, "Sep 28, 2025" otherwise */
+  day(s) {
+    const d = U.parseDate(s);
+    if (!d) return s;
+    const now = new Date();
+    const opt = { month: 'short', day: 'numeric' };
+    if (d.getFullYear() !== now.getFullYear()) opt.year = 'numeric';
+    return d.toLocaleDateString('en-US', opt);
+  },
+  full(s) {
+    const d = U.parseDate(s);
+    return d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : (s || '—');
+  },
+  longToday() {
+    return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  },
+  vehicleName(v) {
+    return `${v.year} ${v.make} ${v.model}`.replace(/\s+/g, ' ').trim();
+  },
+  vehicleShort(v) {
+    return `${String(v.year).slice(2)} ${v.make} ${v.model}`;
+  },
+  svgIcon(name) {
+    const paths = {
+      users: '<path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-8 0a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 3c-3.3 0-8 1.7-8 5v2h16v-2c0-3.3-4.7-5-8-5Zm8 0c-.5 0-1 .04-1.5.11A5.5 5.5 0 0 1 17 16v2h6v-2c0-3.3-4.7-5-8-5Z"/>',
+      wrench: '<path d="M21.7 6.3a5.5 5.5 0 0 1-7.4 6.5L7 20.1a2.5 2.5 0 0 1-3.5-3.5l7.3-7.3a5.5 5.5 0 0 1 6.5-7.4L14 5.2l2.8 2.8 4.9-1.7Z"/>',
+      car: '<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11m-14 0h14m-14 0a2 2 0 0 0-2 2v4h2m14-6a2 2 0 0 1 2 2v4h-2m-14 0v2h3v-2m11 0v2h3v-2m-14 0h11M7.5 14h.01M16.5 14h.01"/>',
+      doc: '<path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm7 0v5h5M9 13h6M9 17h6"/>',
+      check: '<path d="M20 6L9 17l-5-5"/>',
+      search: '<path d="M11 4a7 7 0 1 0 4.4 12.6l4.5 4.5 1.4-1.4-4.5-4.5A7 7 0 0 0 11 4Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/>',
+      plus: '<path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7V4Z"/>',
+    };
+    const n = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    n.setAttribute('viewBox', '0 0 22 22');
+    n.setAttribute('width', name === 'search' ? 18 : 32);
+    n.setAttribute('height', name === 'search' ? 18 : 32);
+    n.setAttribute('fill', 'none');
+    n.setAttribute('stroke', 'currentColor');
+    n.setAttribute('stroke-width', '1.6');
+    n.setAttribute('stroke-linecap', 'round');
+    n.setAttribute('stroke-linejoin', 'round');
+    n.setAttribute('aria-hidden', 'true');
+    n.innerHTML = paths[name] || '';
+    n.style.color = 'var(--ink-mute)';
+    return n;
+  },
+};
+
+/* ------------------------- config overlay -------------------------- */
+/* Client-side configurability layer over the read-only backend config.
+   One localStorage blob; survives page reloads; reset-safe.          */
+
+const Overlay = {
+  KEY: 'llt_crm_overlay_v1',
+  /* fixed AA palette per spec §4.1 — the 6 colored core swatches plus
+     5 additional (plum, teal, slate, moss, rust). Paid is neutral. */
+  SWATCHES: [
+    ['#2E6E8E', '#E3F0F7'], ['#8A5A00', '#FBEED8'], ['#A6450C', '#F9E7DE'],
+    ['#2E7D4F', '#E1F2E8'], ['#4A5FA5', '#E6EAF5'], ['#B3261E', '#F9E4E2'],
+    ['#7A4A8E', '#F0E6F3'], ['#2E7D74', '#E2F1EF'], ['#4A5568', '#E8EAEF'],
+    ['#5A7A2E', '#EDF2E2'], ['#8E4A4A', '#F3E6E6'],
+  ],
+  /* display-name fallbacks, used only when the backend config lacks a
+     key or is missing entirely (the seed config is the source of truth) */
+  DEFAULT_LABELS: {
+    name: 'Name', phone: 'Phone', email: 'Email', address: 'Address', notes: 'Notes',
+    make: 'Make', model: 'Model', year: 'Year', vin: 'VIN', plate: 'License plate', mileage: 'Mileage',
+    date: 'Date', status: 'Status', description: 'Description',
+    labor: 'Labor', parts: 'Parts', total: 'Total', technician: 'Technician',
+  },
+  DEFAULT_TYPES: ['Oil Change', 'Tires & Wheels', 'Brakes', 'Engine & Drivetrain', 'Cooling & A/C', 'Diagnostics', 'Electrical', 'General Repair'],
+  data: { labels: {}, types: null, customs: [], jobs: {} },
+
+  load() {
+    try {
+      const raw = localStorage.getItem(this.KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        this.data = {
+          labels: d.labels || {},
+          types: Array.isArray(d.types) ? d.types : null,
+          customs: Array.isArray(d.customs) ? d.customs : [],
+          jobs: d.jobs && typeof d.jobs === 'object' ? d.jobs : {},
+        };
+      }
+    } catch { /* corrupt overlay = pristine */ }
+  },
+  save(data) {
+    this.data = data || this.data;
+    try {
+      localStorage.setItem(this.KEY, JSON.stringify(this.data));
+    } catch (e) {
+      console.warn('llt-crm: overlay save failed', e);
+      throw new ApiError('conflict', 'Could not save settings (local storage unavailable).');
+    }
+  },
+  jobEx(jobId) {
+    return (this.data.jobs && this.data.jobs[jobId]) || null;
+  },
+  setJobEx(jobId, patch) {
+    this.data.jobs[jobId] = { ...(this.data.jobs[jobId] || {}), ...patch };
+    this.save();
+  },
+};
+
+/* --------------------------- config model --------------------------
+   The backend config is the single source of truth for shopName,
+   fieldLabels, and the legal coarse job statuses (config.statuses).
+   The overlay carries the configurability surface the backend cannot
+   persist: label renames, custom service types, custom statuses, and
+   per-job rich status / service type / odometer.
+
+   The rich status list is config.statuses (displayed with friendly
+   titles) plus any custom statuses the owner added — every rich status
+   maps to a legal coarse status, so the UI can never send the backend
+   an illegal value. */
+
+let cfgCache = null;
+function coarseStatuses() { return (cfgCache && cfgCache.statuses) || ['open', 'in_progress', 'completed', 'cancelled']; }
+function coarseForRich(status) {
+  const i = Overlay.data.customs.indexOf(status);
+  const cycle = coarseStatuses();
+  return cycle[((i % cycle.length) + cycle.length) % cycle.length];
+}
+/* rich status of a job: overlay wins, else the job's own coarse status */
+function jobStatus(job) {
+  const ex = Overlay.jobEx(job.id);
+  if (ex && ex.status) return ex.status;
+  return job.status;
+}
+function allStatuses() {
+  return [...coarseStatuses(), ...Overlay.data.customs];
+}
+function isCustomStatus(name) {
+  return Overlay.data.customs.includes(name);
+}
+/* the coarse backend status a rich/custom status maps to */
+function coarseOf(status) {
+  return isCustomStatus(status) ? coarseForRich(status) : status;
+}
+/* display name for a status: customs show as typed; backend statuses
+   show their friendly title (config.statusLabels when present) */
+const FRIENDLY_STATUS = { open: 'Open', in_progress: 'In Progress', completed: 'Completed', cancelled: 'Cancelled' };
+function statusTitle(status) {
+  if (status == null) return '';
+  if (isCustomStatus(status)) return status;
+  const cfg = cfgCache;
+  if (cfg && cfg.statusLabels && cfg.statusLabels[status]) return cfg.statusLabels[status];
+  return FRIENDLY_STATUS[status] || status;
+}
+/* is this a "not yet done" status (drives "this week", "next up")? */
+function isOpenStatus(status) {
+  return coarseOf(status) === 'open';
+}
+function serviceTypes() {
+  if (Overlay.data.types) return Overlay.data.types;
+  return baseServiceTypes();
+}
+/* display title for a service-type token: "oil_change" -> "Oil change" */
+function typeTitle(t) {
+  if (!t) return '';
+  return String(t).split(/[\s_-]+/).filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+/* the backend's own service-type list (the "default" the settings
+   screen diffs against, independent of any saved overlay) */
+function baseServiceTypes() {
+  if (cfgCache && Array.isArray(cfgCache.serviceTypes) && cfgCache.serviceTypes.length) return cfgCache.serviceTypes;
+  return Overlay.DEFAULT_TYPES;
+}
+/* label resolver (C24): overlay -> backend config -> built-in default */
+function label(key) {
+  const o = Overlay.data.labels;
+  if (o && o[key]) return o[key];
+  if (cfgCache && cfgCache.fieldLabels && cfgCache.fieldLabels[key]) return cfgCache.fieldLabels[key];
+  return Overlay.DEFAULT_LABELS[key] || key;
+}
+
+/* Status colors. The canonical lifecycle from the spec keeps its
+   §4.1 hexes; the backend's own statuses map onto the closest
+   canonical color (open→Scheduled blue, in_progress→In Service amber,
+   completed→Paid neutral, cancelled→No-Show red); custom statuses take
+   the next free swatch from the fixed AA palette. */
+const STATUS_LIGHT = {
+  Scheduled: ['#2E6E8E', '#E3F0F7'], 'In Service': ['#8A5A00', '#FBEED8'],
+  'Awaiting Parts': ['#A6450C', '#F9E7DE'], Ready: ['#2E7D4F', '#E1F2E8'],
+  Invoiced: ['#4A5FA5', '#E6EAF5'], Paid: ['#6B6357', '#EFEBE3'], 'No-Show': ['#B3261E', '#F9E4E2'],
+  open: ['#2E6E8E', '#E3F0F7'], in_progress: ['#8A5A00', '#FBEED8'],
+  completed: ['#6B6357', '#EFEBE3'], cancelled: ['#B3261E', '#F9E4E2'],
+};
+const STATUS_DARK = {
+  Scheduled: '#6EC1E4', 'In Service': '#FFB43C', 'Awaiting Parts': '#FF7A45',
+  Ready: '#6FCF97', Invoiced: '#7AA2FF', Paid: '#8D7F70', 'No-Show': '#FF4A2A',
+  open: '#6EC1E4', in_progress: '#FFB43C', completed: '#8D7F70', cancelled: '#FF4A2A',
+};
+function customSwatch(name) {
+  const customs = Overlay.data.customs;
+  const i = customs.indexOf(name);
+  if (i === -1) return null;
+  const used = new Set();
+  customs.slice(0, i).forEach((s) => {
+    if (!s) return;
+    const pick = Overlay.SWATCHES.find((sw) => !used.has(sw[0]));
+    if (pick) used.add(pick[0]);
+  });
+  return Overlay.SWATCHES.find((sw) => !used.has(sw[0])) || null;
+}
+function statusColor(name) {
+  const dark = document.documentElement.dataset.host === 'dark';
+  if (dark) {
+    const custom = customSwatch(name);
+    const t = custom ? custom[0] : (STATUS_DARK[name] || '#8D7F70');
+    return { text: t, bg: t + '24', border: t + '40' };
+  }
+  if (STATUS_LIGHT[name]) return { text: STATUS_LIGHT[name][0], bg: STATUS_LIGHT[name][1], border: STATUS_LIGHT[name][0] + '40' };
+  const custom = customSwatch(name);
+  return custom ? { text: custom[0], bg: custom[1], border: custom[0] + '40' } : { text: '#6B6357', bg: '#EFEBE3', border: '#6B635740' };
+}
+function chip(status) {
+  const c = statusColor(status);
+  const style = c.text ? `--c:${c.text};--cbg:${c.bg};--cborder:${c.border};` : '';
+  return U.el('span', { class: 'chip num', style }, U.el('span', { class: 'dot', 'aria-hidden': true }), statusTitle(status) || '—');
+}
+
+/* ------------------------------ api -------------------------------- */
+
+let api = null;
+async function apiReady() {
+  if (!api) {
+    api = new CrmApi();
+    await api.getCustomers(); // lazy load (seeds on first run)
+  }
+  if (!cfgCache) cfgCache = (await rawConfig()) || null; // re-probe after invalidation
+  Overlay.load();
+  return api;
+}
+async function rawConfig() {
+  // config is read-only on the backend: probe the live db through a
+  // throwaway CrmApi instance over the SAME storage (localStorage).
+  // _load() is a mock-private member; acceptable because this bundle
+  // owns both halves.
+  const probe = new CrmApi();
+  await probe.getCustomers();
+  return probe._load().config;
+}
+function config() { return cfgCache; }
+function invalidateConfigCache() { cfgCache = null; }
+
+/* ------------------------------ backup ------------------------------ */
+
+/**
+ * Export the full customer dataset to a downloadable JSON file.
+ *
+ * Source of truth: api.getCustomers() — the same localStorage-backed
+ * store every screen reads from. No transform, no filter, no delete:
+ * every record's fields are serialized exactly as stored. Empty data
+ * exports valid JSON with customers: []. No network, no dependencies.
+ */
+async function backupCustomers() {
+  let customers;
+  try {
+    const a = await apiReady();
+    customers = await a.getCustomers(); // no opts -> full dataset
+  } catch (e) {
+    toast('Backup failed: could not read customer data.', 'error', 'Backup');
+    return;
+  }
+  try {
+    const payload = {
+      app: 'lease-logic-crm',
+      exported_at: new Date().toISOString(),
+      record_count: customers.length,
+      customers,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const dl = document.createElement('a');
+    dl.href = url;
+    dl.download = `lease-logic-crm-customers-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.append(dl);
+    dl.click();
+    dl.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+    toast(`Exported ${customers.length} customer${customers.length === 1 ? '' : 's'}.`, 'success', 'Backup');
+  } catch (e) {
+    console.warn('llt-crm: backup export failed', e);
+    toast('Backup failed: could not create the download.', 'error', 'Backup');
+  }
+}
+
+/* ------------------------------ nav -------------------------------- */
+
+const nav = {
+  dirty: false,
+  currentHash: '',
+  allowOnce: false,
+  suppress: false,
+};
+
+function go(hash) {
+  if (hash === location.hash) return;
+  if (nav.dirty) {
+    nav.fromHash = location.hash || '#/dashboard';
+    openLeaveDialog(hash);
+    return;
+  }
+  location.hash = hash;
+}
+
+function setDirty(v) {
+  window.__dirtyLog = window.__dirtyLog || [];
+  window.__dirtyLog.push({ v: !!v, t: Date.now(), stack: (new Error().stack || '').split('\n').slice(2, 5).join(' | ').slice(0, 180) });
+  nav.dirty = !!v;
+  if (v) window.dispatchEvent(new CustomEvent('crm-dirty', { detail: v }));
+  else window.dispatchEvent(new CustomEvent('crm-dirty', { detail: v }));
+}
+
+function openLeaveDialog(pendingHash) {
+  confirmDialog({
+    title: 'Unsaved changes',
+    body: U.el('span', null, 'Leave and discard your changes?'),
+    confirmLabel: 'Discard & leave',
+    cancelLabel: 'Stay',
+    danger: true,
+    focusCancel: true,
+    onConfirm() {
+      setDirty(false);
+      if (pendingHash) go(pendingHash);
+      else render();
+    },
+  });
+}
+
+/* ---------------------------- dialogs ------------------------------ */
+
+let dlgFocusPrev = null;
+function confirmDialog({ title, body, confirmLabel = 'Confirm', cancelLabel = 'Cancel', danger = false, onConfirm, focusCancel = false }) {
+  const host = document.getElementById('dlgHost');
+  const focusables = () => Array.from(dlg.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])')).filter((n) => !n.disabled);
+  const dlg = U.el('div', { class: 'dialog', role: 'alertdialog', 'aria-modal': 'true', 'aria-label': title });
+  dlg.append(
+    U.el('div', { class: 'grab', 'aria-hidden': true }),
+    U.el('h3', { text: title }),
+    U.el('div', { class: 'db' }, body),
+    U.el('div', { class: 'bf' },
+      U.el('button', {
+        class: 'btn secondary', type: 'button', id: 'dlg-cancel',
+        onclick: () => close(),
+      }, cancelLabel),
+      U.el('button', {
+        class: `btn ${danger ? 'danger' : 'primary'}`, type: 'button', id: 'dlg-confirm',
+        onclick: () => {
+          const h = dlg.onConfirm;
+          close();
+          if (h) h();
+        },
+      }, confirmLabel),
+    ),
+  );
+  dlg.onConfirm = onConfirm;
+  const backdrop = U.el('div', { class: 'backdrop', onclick: (e) => { if (e.target === backdrop) close(); } }, dlg);
+  host.append(backdrop);
+  document.body.style.overflow = 'hidden';
+  dlgFocusPrev = document.activeElement;
+  const key = (e) => {
+    if (e.key === 'Escape') { e.stopPropagation(); close(); }
+    else if (e.key === 'Tab') {
+      const f = focusables();
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  };
+  backdrop.addEventListener('keydown', key);
+  (focusCancel ? dlg.querySelector('#dlg-cancel') : dlg.querySelector('#dlg-confirm')).focus();
+  function close() {
+    backdrop.removeEventListener('keydown', key);
+    backdrop.remove();
+    document.body.style.overflow = '';
+    if (dlgFocusPrev && dlgFocusPrev.focus) {
+      try { dlgFocusPrev.focus(); } catch { /* node gone */ }
+    }
+  }
+  return { close };
+}
+
+/* ------------------------------ toasts ----------------------------- */
+
+function toast(message, kind = 'success', title) {
+  const host = document.getElementById('toastHost');
+  host.innerHTML = '';
+  const t = U.el('div', { class: `toast ${kind}`, role: 'status' },
+    title ? U.el('div', { class: 'tt', text: title }) : null,
+    U.el('div', { text: message }));
+  host.append(t);
+  clearTimeout(t._t1);
+  clearTimeout(t._t2);
+  t._t1 = setTimeout(() => {
+    t.classList.add('out');
+    t._t2 = setTimeout(() => t.remove(), 220);
+  }, 4000);
+}
+
+/* ------------------------------ shell ------------------------------ */
+
+function buildShell(root) {
+  const qaMenu = U.el('div', { class: 'qamenu', role: 'menu', id: 'qaMenu' });
+  const qaWrap = U.el('div', { class: 'qamenu-wrap' },
+    U.el('button', {
+      class: 'btn primary', type: 'button', 'aria-haspopup': 'true', 'aria-expanded': 'false', id: 'newBtn',
+      onclick: () => toggleQa(qaWrap, qaMenu),
+    }, U.el('span', { 'aria-hidden': true, text: '+' }), 'New'),
+    qaMenu,
+  );
+
+  const navLink = (hash, text, icon) => U.el('a', {
+    class: 'it', href: hash, 'data-nav': hash,
+    onclick: (e) => { e.preventDefault(); go(hash); closeQa(); closeDrawer(); },
+  }, icon ? U.el('span', { class: 'tico', 'aria-hidden': true, text: icon }) : null, text);
+
+  const sidebarNav = U.el('div', { class: 'nav', 'aria-label': 'Primary' },
+    navLink('#/dashboard', 'Dashboard', '▣'),
+    navLink('#/customers', 'Customers', '☰'),
+  );
+  const sideBottom = U.el('div', { class: 'side-bottom nav' },
+    navLink('#/settings', 'Settings', '⚙'),
+    U.el('a', { class: 'it', href: '#home', onclick: crmExit }, U.el('span', { class: 'tico', 'aria-hidden': true, text: '↗' }), 'View website'),
+    U.el('a', { class: 'it', href: '#home', title: 'Back to the host site', onclick: crmLogout }, U.el('span', { class: 'tico', 'aria-hidden': true, text: '⏻' }), 'Log out'),
+  );
+
+  const sidebar = U.el('nav', { class: 'sidebar', 'aria-label': 'Main' },
+    U.el('div', { class: 'brand' }, U.el('span', { class: 'mark', 'aria-hidden': true, text: '◆' }), document.getElementById('crmShopName').textContent || 'Shop'),
+    qaWrap,
+    sidebarNav,
+    sideBottom,
+  );
+
+  const drawerClose = U.el('button', { class: 'iconbtn', type: 'button', 'aria-label': 'Close menu', text: '✕' });
+  const drawerNav = U.el('div', { class: 'nav', style: 'margin-top:12px;' },
+    navLink('#/dashboard', 'Dashboard'),
+    navLink('#/customers', 'Customers'),
+    U.el('div', { style: 'border-top:1px solid var(--border); margin:8px 0;' }),
+    navLink('#/settings', 'Settings'),
+  );
+  const drawer = U.el('div', { class: 'drawer', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Menu', id: 'drawer' },
+    U.el('div', { style: 'display:flex; align-items:center; gap:8px; padding:4px 10px 12px;' },
+      U.el('div', { class: 'brand', style: 'padding:0; flex:1;' }, U.el('span', { class: 'mark', 'aria-hidden': true, text: '◆' }), 'Shop'),
+      drawerClose,
+    ),
+    U.el('div', { class: 'qamenu-wrap', style: 'position:static;' },
+      U.el('button', { class: 'btn primary full', type: 'button', onclick: () => go('#/jobs/new') }, '+ New service job'),
+    ),
+    drawerNav,
+  );
+  const drawerBackdrop = U.el('div', { class: 'drawer-backdrop', id: 'drawerBackdrop', style: 'display:none;' });
+  function closeDrawer() {
+    if (!drawerBackdrop) return;
+    drawer.remove();
+    drawerBackdrop.remove();
+  }
+  drawerClose.addEventListener('click', closeDrawer);
+  drawerBackdrop.addEventListener('click', closeDrawer);
+
+  const tabItem = (hash, text, icon) => U.el('a', {
+    class: 'ti', href: hash, 'data-nav': hash,
+    onclick: (e) => { e.preventDefault(); go(hash); closeDrawer(); },
+  }, U.el('span', { class: 'tico', 'aria-hidden': true, text: icon }), text);
+
+  const tabbar = U.el('nav', { class: 'tabbar', 'aria-label': 'Tabs' },
+    tabItem('#/dashboard', 'Dashboard', '▣'),
+    tabItem('#/customers', 'Customers', '☰'),
+    U.el('button', {
+      class: 'plus', type: 'button', 'aria-label': 'New', onclick: () => go('#/jobs/new'),
+    }, '+'),
+    tabItem('#/settings', 'Settings', '⚙'),
+  );
+
+  const topbar = U.el('header', { class: 'topbar' },
+    U.el('span', { class: 'tbrand' }, U.el('span', { class: 'mark', 'aria-hidden': true, text: '◆' }), 'Shop'),
+    U.el('span', { class: 'sp' }),
+    U.el('button', {
+      class: 'iconbtn', type: 'button', 'aria-label': 'Open menu', text: '☰',
+      onclick: () => {
+        if (drawer.parentNode) { closeDrawer(); return; }
+        drawer.style.position = 'fixed';
+        document.getElementById('crmMount').append(drawer, drawerBackdrop);
+        drawerClose.focus();
+      },
+    }),
+  );
+
+  const view = U.el('div', { id: 'view', class: 'content', role: 'main' });
+  const main = U.el('main', { id: 'main' }, view);
+
+  root.append(
+    U.el('a', { class: 'skip', href: '#main' }, 'Skip to content'),
+    U.el('div', { class: 'app' },
+      sidebar,
+      U.el('div', { class: 'main-col' }, topbar, main, tabbar),
+    ),
+    U.el('div', { id: 'dlgHost' }),
+    U.el('div', { class: 'toasthost', id: 'toastHost', 'aria-live': 'polite' }),
+  );
+  // shop name is set after the api loads (buildShell runs before apiReady)
+  window.__crmBrandEls = [sidebar.querySelector('.brand'), topbar.querySelector('.tbrand'), drawer.querySelector('.brand')];
+}
+
+function setShopName(name) {
+  document.title = name ? `${name} — CRM` : 'CRM';
+  const els = window.__crmBrandEls || [];
+  els.forEach((b) => {
+    if (!b) return;
+    const mark = b.querySelector('.mark');
+    b.textContent = '';
+    b.append(mark, document.createTextNode(name));
+  });
+}
+
+function toggleQa(wrap, menu) {
+  const btn = wrap.querySelector('button');
+  const open = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', String(open));
+  if (open) {
+    menu.innerHTML = '';
+    const items = [
+      { t: 'Customer', h: '#/customers/new' },
+      { t: 'Vehicle', h: quickAddVehicleHash() },
+      { t: 'Service job', h: '#/jobs/new' },
+    ];
+    items.forEach((it) => menu.append(U.el('a', {
+      class: 'mi', role: 'menuitem', href: it.h,
+      onclick: (e) => { e.preventDefault(); go(it.h); closeQa(); },
+    }, it.t)));
+    menu.querySelector('.mi').focus();
+  }
+}
+function closeQa() {
+  const m = document.getElementById('qaMenu');
+  if (m) {
+    m.classList.remove('open');
+    const b = document.getElementById('newBtn');
+    if (b) b.setAttribute('aria-expanded', 'false');
+  }
+}
+document.addEventListener('click', (e) => {
+  const m = document.getElementById('qaMenu');
+  if (m && m.classList.contains('open') && !e.target.closest('.qamenu-wrap')) closeQa();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeQa();
+  if (e.key === 'Escape' && document.getElementById('drawer')) {
+    const d = document.getElementById('drawer'), b = document.getElementById('drawerBackdrop');
+    d.remove(); b.remove();
+  }
+});
+
+function quickAddVehicleHash() {
+  const m = (location.hash || '').match(/^#\/customers\/(c\d+)$/);
+  return m ? `#/customers/${m[1]}/vehicles/new` : '#/vehicles/new';
+}
+
+function setActiveNav() {
+  const h = location.hash || '#/dashboard';
+  const active = h.startsWith('#/customers') ? '#/customers' : h.startsWith('#/jobs') ? null : h;
+  document.querySelectorAll('[data-nav]').forEach((n) => {
+    n.classList.toggle('active', n.getAttribute('data-nav') === active);
+  });
+}
+
+/* --------------------------- load helpers -------------------------- */
+
+function skeletonBlocks() {
+  return U.el('div', { class: 'skel-list', 'aria-hidden': true },
+    U.el('div', { class: 'skel shimmer skel-line h24', style: 'width:30%;' }),
+    U.el('div', { class: 'skel shimmer skel-line w80' }),
+    U.el('div', { class: 'skel shimmer skel-line w60' }),
+    U.el('div', { class: 'skel shimmer skel-line w80' }),
+    U.el('div', { class: 'skel shimmer skel-line w60' }),
+  );
+}
+
+async function withLoad(container, loader) {
+  container.innerHTML = '';
+  container.append(skeletonBlocks());
+  try {
+    const data = await loader();
+    // NOTE: do not clear the container here — the loader may have
+    // already rendered into it (synchronous paints inside the async fn).
+    return data;
+  } catch (e) {
+    container.innerHTML = '';
+    container.append(loadError(e));
+    return null;
+  }
+}
+
+function loadError(e) {
+  const isApi = e instanceof ApiError;
+  if (isApi && e.code === 'not_found') return notFoundScreen(e.message);
+  const b = U.el('div', { class: 'banner block' },
+    U.el('div', { style: 'text-align:center;' },
+      U.el('div', { class: 'bt', text: "Couldn't load this screen." }),
+      U.el('div', { class: 'bd', text: isApi ? e.message : 'Something went wrong reaching the data.' }),
+      U.el('div', { style: 'margin-top:14px;' }, U.el('button', {
+        class: 'btn secondary', type: 'button', text: 'Retry',
+        onclick: () => render(),
+      })),
+    ),
+  );
+  return b;
+}
+
+function notFoundScreen(msg) {
+  return U.el('div', { class: 'empty' },
+    U.el('div', { class: 'et', text: 'This record doesn’t exist (or was deleted).' }),
+    U.el('div', { class: 'eb', text: msg || '' }),
+    U.el('a', { class: 'btn primary', href: '#/customers', onclick: (e) => { e.preventDefault(); go('#/customers'); } }, 'Back to customers'),
+  );
+}
+
+function emptyState({ icon = 'users', title, body, cta }) {
+  return U.el('div', { class: 'empty' },
+    U.el('div', { style: 'display:inline-block;' }, U.svgIcon(icon)),
+    U.el('div', { class: 'et', text: title }),
+    body ? U.el('div', { class: 'eb', text: body }) : null,
+    cta ? U.el('div', { class: 'row', style: 'border-top:none;' }, cta.map((c) => U.el('a', {
+      class: `btn ${c.variant || 'primary'}`, href: c.href,
+      onclick: (e) => { e.preventDefault(); go(c.href); },
+    }, c.label))) : null,
+  );
+}
+
+/* --------------------------- form helpers -------------------------- */
+
+/* A form kit: field registry, dirty tracking, validation flow. */
+class FormKit {
+  constructor(opts) {
+    this.opts = opts; // { onSubmit(values), submitLabel, dirtyable }
+    this.fields = new Map(); // name -> {node, input, validate, value, setErr, clearErr, labelEl}
+    this.snapshot = null;
+    this.root = U.el('div', { class: `form-col ${opts.wide ? 'wide' : ''} ${opts.extraClass || ''}` });
+    // The save button renders OUTSIDE the <form> (in the footer row), so a
+    // native type=submit button would be inert — associate it via the
+    // `form` attribute (needs a form id).
+    this.formId = `form-${(FormKit._seq = (FormKit._seq || 0) + 1)}`;
+    this.saveBtn = U.el('button', { class: 'btn primary', type: 'submit', disabled: false, form: this.formId }, opts.submitLabel);
+    this.foot = U.el('div', { class: 'formfoot' },
+      opts.dangerExtra || null,
+      U.el('span', { class: 'sp' }),
+      U.el('button', {
+        class: 'btn ghost', type: 'button',
+        onclick: () => go(opts.cancelHref || '#/customers'),
+      }, 'Cancel'),
+      this.saveBtn,
+    );
+    this.errBanner = U.el('div', { class: 'banner inline', style: 'display:none;' });
+    this.form = U.el('form', { id: this.formId, novalidate: true, onsubmit: (e) => { e.preventDefault(); this.submit(); } },
+      this.errBanner,
+    );
+    this.root.append(this.form, this.foot);
+  }
+
+  field(f) {
+    this.fields.set(f.name, f);
+    if (f.input) {
+      f.input.addEventListener('input', () => this.touch());
+      f.input.addEventListener('blur', () => {
+        if (f.touched !== true) {
+          f.touched = true;
+          f.validate(f.value());
+        }
+      });
+    }
+    return f;
+  }
+
+  makeField({ name, lbl, required, hint, type = 'text', placeholder, mono, maxlength, inputmode, attrs = {}, extra, validate }) {
+    const errEl = U.el('div', { class: 'errmsg', role: 'alert', style: 'display:none;' });
+    const inp = U.el('input', {
+      class: `inp ${mono ? 'mono' : ''}`, type, name,
+      placeholder, maxlength: maxlength ? String(maxlength) : false,
+      inputmode: inputmode || false,
+      'aria-required': required ? 'true' : false,
+      ...attrs,
+    });
+    const lab = U.el('label', { for: `f-${name}` }, lbl, required ? U.el('span', { class: 'req', 'aria-hidden': true, text: ' *' }) : null);
+    inp.id = `f-${name}`;
+    const wrap = U.el('div', { class: 'field', 'data-field': name },
+      U.el('div', { class: 'lr' }, lab, extra || null),
+      inp,
+      hint ? U.el('div', { class: 'hint', text: hint }) : null,
+      errEl,
+    );
+    const field = {
+      name, input: inp, labelEl: lab, errEl,
+      // Reads from `this.input` live: screens may replace the input node
+      // (hidden input -> real select / textarea) after makeField returns,
+      // and this.field() keeps `field.input` pointing at the replacement.
+      value() { return this.input.value; },
+      setErr(msg) {
+        const el = this.input; // live: screens may swap in a select/textarea
+        if (msg) {
+          errEl.textContent = msg;
+          errEl.style.display = '';
+          el.classList.add('invalid');
+          el.setAttribute('aria-invalid', 'true');
+          el.setAttribute('aria-describedby', `err-${name}`);
+          errEl.id = `err-${name}`;
+        } else {
+          errEl.style.display = 'none';
+          errEl.textContent = '';
+          el.classList.remove('invalid');
+          el.removeAttribute('aria-invalid');
+          el.removeAttribute('aria-describedby');
+        }
+      },
+      clearErr() { this.setErr(null); },
+      // Per-field validator supplied by the screen (design spec §7).
+      // Paints the result on every call so first-blur AND submit both
+      // produce inline errors; returns the message (null = valid).
+      validate(v) {
+        const msg = validate ? validate(v) : null;
+        this.setErr(msg);
+        return msg;
+      },
+    };
+    this.form.append(wrap);
+    this.field(field);
+    return field;
+  }
+
+  snapshotNow() {
+    this.snapshot = Object.fromEntries([...this.fields.values()].map((f) => [f.name, f.value()]));
+    setDirty(false);
+  }
+
+  isDirty() {
+    if (!this.snapshot) return false;
+    return [...this.fields.values()].some((f) => f.value() !== this.snapshot[f.name]);
+  }
+
+  touch() {
+    setDirty(this.isDirty());
+  }
+
+  validateAll() {
+    let first = null, count = 0;
+    for (const f of this.fields.values()) {
+      const msg = f.validate(f.value());
+      f.setErr(msg);
+      if (msg) {
+        count++;
+        if (!first) first = f;
+      }
+    }
+    return { first, count };
+  }
+
+  setApiErrors(errors) {
+    let count = 0;
+    for (const [k, v] of Object.entries(errors || {})) {
+      if (k.startsWith('_')) continue;
+      const f = this.fields.get(k);
+      if (f) {
+        f.setErr(String(v));
+        count++;
+      }
+    }
+    return count;
+  }
+
+  announceErrors(count) {
+    if (!count) return;
+    const a = U.el('div', { class: 'errmsg', role: 'alert', style: 'margin-bottom:12px;' }, `${count} field${count > 1 ? 's' : ''} need${count > 1 ? '' : 's'} attention`);
+    this.form.prepend(a);
+    setTimeout(() => a.remove(), 6000);
+  }
+
+  async submit() {
+    this.errBanner.style.display = 'none';
+    const { first, count } = this.validateAll();
+    if (count) {
+      this.announceErrors(count);
+      first.input.scrollIntoView({ block: 'center' });
+      first.input.focus();
+      return;
+    }
+    const values = Object.fromEntries([...this.fields.values()].map((f) => [f.name, f.value()]));
+    this.saveBtn.disabled = true;
+    this.saveBtn.innerHTML = '';
+    this.saveBtn.append(U.el('span', { class: 'spinner', 'aria-hidden': true }), document.createTextNode(this.opts.submitLabel));
+    const t0 = Date.now();
+    try {
+      const result = await this.opts.onSubmit(values);
+      const wait = Math.max(0, 200 - (Date.now() - t0));
+      setTimeout(() => {
+        setDirty(false);
+        if (result && result.toast) toast(result.toast);
+        if (result && result.go) go(result.go);
+      }, wait);
+    } catch (e) {
+      this.saveBtn.disabled = false;
+      this.saveBtn.innerHTML = '';
+      this.saveBtn.textContent = this.opts.submitLabel;
+      if (e instanceof ApiError && e.code === 'validation') {
+        const n = this.setApiErrors(e.errors);
+        if (n) {
+          // Do NOT re-run validateAll() here: the API can reject input the
+          // client validators passed (server-side rules — referential
+          // checks, unknown status), so re-validating would call
+          // setErr(null) on those fields and wipe the API errors we just
+          // painted. Focus the first flagged field.
+          const firstInvalid = this.form.querySelector('.invalid');
+          if (firstInvalid) firstInvalid.focus();
+          return;
+        }
+      }
+      this.errBanner.innerHTML = '';
+      this.errBanner.append(
+        U.el('span', { class: 'bt', text: "Couldn't save." }),
+        U.el('span', { class: 'bd', text: `${e && e.message ? e.message : 'Unknown error.'} Your input is kept — try again.` }),
+      );
+      this.errBanner.style.display = '';
+    }
+  }
+}
+
+/* number/currency field helpers */
+function parseMoney(s) {
+  if (s === '' || s == null) return null;
+  const n = Number(String(s).replace(/[$,\s]/g, ''));
+  return Number.isFinite(n) ? n : NaN;
+}
+function sanitizeMoneyInput(inp) {
+  const n = parseMoney(inp.value);
+  if (n === null) { inp.value = ''; return; }
+  if (!Number.isFinite(n) || n < 0) { inp.value = ''; return; }
+  inp.value = String(Math.min(999999.99, n));
+}
+function parseNumStr(s) {
+  if (s === '' || s == null) return null;
+  const n = parseInt(String(s).replace(/[^\d]/g, ''), 10);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function counterEl({ showAt, max }) {
+  const c = U.el('span', { class: 'counter', style: 'display:none;', 'aria-live': 'polite' });
+  return {
+    node: c,
+    bind(inp) {
+      const upd = () => {
+        const len = inp.value.length;
+        if (len >= showAt || (max && len > max)) {
+          c.style.display = '';
+          c.textContent = `${len.toLocaleString('en-US')} / ${max.toLocaleString('en-US')}`;
+          c.classList.toggle('warn', len > max);
+        } else c.style.display = 'none';
+      };
+      inp.addEventListener('input', upd);
+      upd();
+    },
+  };
+}
+
+/* roving tabindex for clickable table rows */
+function rovingRows(container, activate) {
+  const rows = () => Array.from(container.querySelectorAll('tr.rowlink'));
+  const sync = () => {
+    const r = rows();
+    r.forEach((row, i) => row.setAttribute('tabindex', i === 0 ? '0' : '-1'));
+  };
+  container.addEventListener('keydown', (e) => {
+    const r = rows();
+    const i = r.indexOf(document.activeElement);
+    if (i === -1) return;
+    let j = -1;
+    if (e.key === 'ArrowDown') j = Math.min(r.length - 1, i + 1);
+    else if (e.key === 'ArrowUp') j = Math.max(0, i - 1);
+    else if (e.key === 'Home') j = 0;
+    else if (e.key === 'End') j = r.length - 1;
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(r[i].dataset.id); return; }
+    else return;
+    e.preventDefault();
+    r[i].setAttribute('tabindex', '-1');
+    r[j].setAttribute('tabindex', '0');
+    r[j].focus();
+  });
+  sync();
+  return { sync };
+}
+
+/* ------------------------------ router ----------------------------- */
+
+const screens = {};
+function registerScreen(name, fn) { screens[name] = fn; }
+
+const ROUTES = [
+  { re: /^#\/$/, go: (ctx) => go('#/dashboard') },
+  { re: /^#\/dashboard$/, screen: 'dashboard' },
+  { re: /^#\/customers$/, screen: 'customers' },
+  { re: /^#\/customers\/new$/, screen: 'customerForm' },
+  { re: /^#\/customers\/(c\d+)$/, screen: 'customerDetail' },
+  { re: /^#\/customers\/(c\d+)\/edit$/, screen: 'customerForm' },
+  { re: /^#\/customers\/(c\d+)\/vehicles\/new$/, go: (ctx) => go(`#/vehicles/new?customer=${ctx.m[1]}`) },
+  { re: /^#\/vehicles\/(v\d+)$/, screen: 'vehicleForm' },
+  { re: /^#\/vehicles\/new$/, screen: 'vehicleForm' },
+  { re: /^#\/jobs\/new$/, screen: 'jobForm' },
+  { re: /^#\/jobs\/(j\d+)$/, screen: 'jobForm' },
+  { re: /^#\/settings$/, screen: 'settings' },
+];
+
+function parseRoute() {
+  const h = location.hash || '#/';
+  const qi = h.indexOf('?');
+  const path = qi === -1 ? h : h.slice(0, qi);
+  const query = new URLSearchParams(qi === -1 ? '' : h.slice(qi + 1));
+  return { path, query, hash: h };
+}
+
+function render() {
+  window.__routeLog = window.__routeLog || [];
+  window.__routeLog.push({ hash: location.hash, dirty: nav.dirty, t: Date.now() });
+  setDirty(false);
+  nav.currentHash = location.hash;
+  const view = document.getElementById('view');
+  if (!view) return;
+  setActiveNav();
+  closeQa();
+  const { path, query } = parseRoute();
+  for (const r of ROUTES) {
+    const m = path.match(r.re);
+    if (!m) continue;
+    if (r.go) { r.go({ query, m }); return; }
+    view.innerHTML = '';
+    document.getElementById('main').scrollTo?.(0, 0);
+    window.scrollTo(0, 0);
+    document.getElementById('crmMount').scrollTop = 0;
+    screens[r.screen](view, { id: m[1] || null, query });
+    return;
+  }
+  // unmatched
+  view.innerHTML = '';
+  view.append(notFoundScreen(`No screen at “${path}”.`));
+}
+
+window.addEventListener('hashchange', () => {
+  if (nav.suppress) { nav.suppress = false; return; }
+  if (nav.dirty) {
+    if (nav.allowOnce) {
+      nav.allowOnce = false;
+      render();
+      return;
+    }
+    // Dirty form bypassed via back/forward or a manual hash edit:
+    // restore the form's route, then offer the leave dialog.
+    const from = nav.currentHash || location.hash;
+    if (from !== location.hash) {
+      nav.suppress = true;
+      location.hash = from; // fires another hashchange; suppressed
+      if (from === location.hash) nav.suppress = false;
+    }
+    openLeaveDialog(null);
+    return;
+  }
+  render();
+});
+
+window.addEventListener('beforeunload', (e) => {
+  if (nav.dirty) { e.preventDefault(); e.returnValue = ''; }
+});
+
+/* ------------------------------ boot ------------------------------- */
+
+async function boot() { if (window.__crmBooted) return; window.__crmBooted = true;
+  const root = U.el('div', { id: 'crm-root' });
+  document.getElementById('crmMount').append(root);
+  const nameSpan = U.el('span', { id: 'crmShopName', style: 'display:none;', text: 'Loading…' });
+  document.getElementById('crmMount').append(nameSpan);
+  buildShell(root);
+
+  const dark = document.documentElement.getAttribute('data-host') === 'dark' || document.body.getAttribute('data-host') === 'dark';
+  if (dark) document.documentElement.setAttribute('data-host', 'dark');
+
+  try {
+    await apiReady();
+    const cfg = await config();
+    setShopName(cfg.shopName || 'Shop CRM');
+    Overlay.load();
+  } catch (e) {
+    root.innerHTML = '';
+    root.append(loadError(e));
+    return;
+  }
+
+  if (!location.hash) {
+    nav.suppress = false;
+    location.hash = '#/dashboard';
+  } else {
+    render();
+  }
+}
+
+
+;
+/* ============================================================
+   llt-crm — screens (W1–W7)
+   Each screen: (view, ctx) => renders into view. ctx = { id, query }.
+   ============================================================ */
+'use strict';
+
+/* ------------------------- shared lookups -------------------------- */
+
+/* one pass: everything a list row needs, keyed by id */
+async function listData() {
+  const [customers, vehicles, jobs] = await Promise.all([
+    api.getCustomers(),
+    api.getVehicles(),
+    api.getJobs({ dir: 'date_desc' }),
+  ]);
+  const vehByCust = {}, jobsByCust = {}, jobsByVeh = {}, custById = {}, vehById = {};
+  customers.forEach((c) => { custById[c.id] = c; vehByCust[c.id] = []; jobsByCust[c.id] = []; });
+  vehicles.forEach((v) => { vehById[v.id] = v; (vehByCust[v.customerId] || (vehByCust[v.customerId] = [])).push(v); });
+  jobs.forEach((j) => {
+    (jobsByCust[j.customerId] || (jobsByCust[j.customerId] = [])).unshift(j); // date_desc in
+    (jobsByVeh[j.vehicleId] || (jobsByVeh[j.vehicleId] = [])).unshift(j);
+  });
+  return { customers, vehicles, jobs, custById, vehById, vehByCust, jobsByCust, jobsByVeh };
+}
+
+/* ----------------------------- W1 dashboard ------------------------ */
+
+registerScreen('dashboard', (view) => {
+  const bar = U.el('div', { class: 'bar' },
+    U.el('h1', { text: 'Today' }),
+    U.el('span', { class: 'meta', text: U.longToday() }),
+    U.el('span', { class: 'sp' }),
+    U.el('a', { class: 'btn primary', href: '#/jobs/new', onclick: (e) => { e.preventDefault(); go('#/jobs/new'); } }, 'New job'),
+  );
+  const body = U.el('div', null);
+  view.append(bar, body);
+
+  withLoad(body, async () => {
+    body.innerHTML = '';
+    const [dash, data] = await Promise.all([api.getDashboard(), listData()]);
+    const today = U.todayISO();
+    const { customers, custById, vehById, jobsByCust } = data;
+    const name = (id) => (custById[id] ? custById[id].name : id);
+    const vname = (id) => (vehById[id] ? U.vehicleName(vehById[id]) : id);
+    const jobs = data.jobs;
+
+    if (customers.length === 0) {
+      body.append(emptyState({
+        title: 'No customers yet',
+        body: 'Add your first customer to start tracking service history.',
+        cta: [
+          { label: 'Add customer', href: '#/customers/new', variant: 'primary' },
+          { label: 'Add job', href: '#/jobs/new', variant: 'secondary' },
+        ],
+      }));
+      return;
+    }
+
+    /* Needs attention (spec W1 order: invoices, parts, service gaps).
+       Rich "Invoiced" only exists when a config/overlay defines it;
+       with the stock backend statuses this block is simply empty. */
+    const attention = [];
+    jobs.filter((j) => jobStatus(j) === 'Invoiced' && U.daysBetween(j.date, today) > 7)
+      .sort((a, b) => a.date < b.date ? -1 : 1)
+      .forEach((j) => attention.push({
+        chip: 'Invoiced',
+        label: `Follow up on invoice — ${name(j.customerId)}`,
+        money: U.money(j.total), href: `#/jobs/${j.id}`,
+      }));
+    jobs.filter((j) => isOpenStatus(jobStatus(j))
+      && U.daysBetween(today, j.date) >= 0 && U.daysBetween(today, j.date) <= 7
+      && /part|eta|order|arriv/i.test(`${j.notes} ${j.description}`))
+      .sort((a, b) => a.date < b.date ? -1 : 1)
+      .forEach((j) => attention.push({
+        chip: jobStatus(j),
+        label: `Confirm parts — ${vname(j.vehicleId)}, ${U.day(j.date)}`,
+        href: `#/jobs/${j.id}`,
+      }));
+    customers.forEach((c) => {
+      const cj = jobsByCust[c.id] || [];
+      if (!cj.length) return;
+      const last = cj[0]; // list is date_desc
+      if (U.daysBetween(last.date, today) > 730 && !cj.some((j) => isOpenStatus(jobStatus(j)))) {
+        attention.push({
+          chip: null,
+          label: `No service in 2 years — ${c.name}`,
+          href: `#/customers/${c.id}`,
+        });
+      }
+    });
+
+    const attCard = U.el('section', { class: 'card', 'aria-label': 'Needs attention' },
+      U.el('div', { class: 'ct' }, 'Needs attention'),
+      attention.length
+        ? U.el('div', { class: 'rows' }, attention.slice(0, 5).map((r) => U.el('div', { class: 'row' },
+            r.chip ? chip(r.chip) : null,
+            U.el('a', { href: r.href, text: r.label, onclick: (e) => { e.preventDefault(); go(r.href); } }),
+            U.el('span', { class: 'sp' }),
+            r.money ? U.el('span', { class: 'rd num', text: r.money }) : null,
+            U.el('a', { class: 'btn ghost sm', href: r.href, text: 'Open', onclick: (e) => { e.preventDefault(); go(r.href); } }),
+          )))
+        : U.el('div', { class: 'empty muted' }, 'Nothing needs attention.'),
+    );
+
+    /* This week */
+    const weekEnd = U.addDaysISO(today, 7);
+    const week = jobs
+      .filter((j) => isOpenStatus(jobStatus(j)) && j.date >= today && j.date <= weekEnd)
+      .sort((a, b) => (a.date === b.date ? (a.id < b.id ? -1 : 1) : a.date < b.date ? -1 : 1));
+    const weekCard = U.el('section', { class: 'card', 'aria-label': 'This week' },
+      U.el('div', { class: 'ct' }, 'This week', U.el('span', { class: 'meta num', text: `${U.day(today)} – ${U.day(weekEnd)}` })),
+      week.length
+        ? U.el('div', { class: 'rows' }, week.map((j) => U.el('div', { class: 'row' },
+            U.el('span', { class: 'rd num', text: U.day(j.date) }),
+            U.el('a', { href: `#/customers/${j.customerId}`, text: name(j.customerId), onclick: (e) => { e.preventDefault(); go(`#/customers/${j.customerId}`); } }),
+            U.el('span', { class: 'rmeta', text: vname(j.vehicleId) }),
+            U.el('span', { class: 'sp' }),
+            chip(jobStatus(j)),
+          )))
+        : U.el('div', { class: 'empty muted' },
+            'No jobs scheduled this week. ',
+            U.el('a', { href: '#/jobs/new', text: 'Add a job', onclick: (e) => { e.preventDefault(); go('#/jobs/new'); } })),
+    );
+
+    /* Recent jobs */
+    const recentCard = U.el('section', { class: 'card', 'aria-label': 'Recent jobs' },
+      U.el('div', { class: 'ct' }, 'Recent jobs',
+        U.el('span', { class: 'sp' }),
+        U.el('a', { href: '#/customers', text: 'All customers →', onclick: (e) => { e.preventDefault(); go('#/customers'); } })),
+      dash.recentJobs.length
+        ? U.el('div', { class: 'rows' }, dash.recentJobs.map((j) => U.el('div', { class: 'row' },
+            U.el('span', { class: 'rd num', text: U.full(j.date) }),
+            U.el('a', { href: `#/jobs/${j.id}`, text: `${name(j.customerId)} — ${j.description}`, onclick: (e) => { e.preventDefault(); go(`#/jobs/${j.id}`); } }),
+            U.el('span', { class: 'sp' }),
+            U.el('span', { class: 'rd num', text: U.money(j.total) }),
+            chip(jobStatus(j)),
+          )))
+        : U.el('div', { class: 'empty muted' }, 'No jobs yet.'),
+    );
+
+    body.append(attCard, weekCard, recentCard);
+  });
+});
+
+/* ---------------------------- W2 customer list --------------------- */
+
+const LIST_SORT_KEY = 'llt_crm_listsort';
+const PAGE_SIZE = 25;
+
+function listSort() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem(LIST_SORT_KEY) || 'null');
+    if (s && ['name', 'last', 'next'].includes(s.key) && ['asc', 'desc'].includes(s.dir)) return s;
+  } catch { /* fall through */ }
+  return { key: 'name', dir: 'asc' };
+}
+
+registerScreen('customers', (view) => {
+  const state = { q: '', sort: listSort(), page: 1 };
+  window.__crmFormPreserve = null;
+
+  const bar = U.el('div', { class: 'bar' },
+    U.el('h1', { text: 'Customers' }),
+    U.el('span', { class: 'meta num', id: 'custCount', 'aria-live': 'polite', text: '' }),
+    U.el('span', { class: 'sp' }),
+    U.el('button', { class: 'btn secondary', type: 'button', 'aria-label': 'Backup customers to a JSON file', onclick: () => backupCustomers() }, 'Backup customers'),
+    U.el('a', { class: 'btn primary', href: '#/customers/new', onclick: (e) => { e.preventDefault(); go('#/customers/new'); } }, 'Add customer'),
+  );
+
+  const search = U.el('div', { class: 'search' },
+    U.el('span', { class: 'sicon', 'aria-hidden': true }, U.svgIcon('search')),
+    U.el('input', {
+      class: 'inp', type: 'search', role: 'searchbox',
+      placeholder: 'Search name, phone, email, VIN, plate…',
+      'aria-label': 'Search customers',
+    }),
+    U.el('button', { class: 'clear', type: 'button', 'aria-label': 'Clear search', text: '×', style: 'display:none;' }),
+  );
+  const qInput = search.querySelector('input');
+  const qClear = search.querySelector('.clear');
+
+  const tableWrap = U.el('div', { class: 'tbl-wrap' });
+  const cardStack = U.el('div', { class: 'cstack' });
+  const pager = U.el('div', { class: 'pager' });
+
+  view.append(bar, search, U.el('div', { id: 'cbody' }), tableWrap, cardStack, pager);
+
+  let cache = null; // {rows: enriched customers}
+
+  function enrich(rows) {
+    return rows.map((c) => {
+      const vs = (cache.vehByCust[c.id] || []);
+      const js = (cache.jobsByCust[c.id] || []); // date_desc
+      const last = js[0] || null;
+      const next = js.find((j) => isOpenStatus(jobStatus(j)) && j.date >= U.todayISO()) || null;
+      return { c, vs, last, next };
+    });
+  }
+
+  function draw() {
+    if (!cache) return;
+    let rows = enrich(cache.customers);
+
+    if (state.q) {
+      const q = state.q.toLowerCase();
+      rows = rows.filter(({ c, vs }) =>
+        c.name.toLowerCase().includes(q) ||
+        c.phone.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        vs.some((v) => v.vin.toLowerCase().includes(q) || v.plate.toLowerCase().includes(q)));
+    }
+
+    const { key, dir } = state.sort;
+    const mul = dir === 'asc' ? 1 : -1;
+    const val = (r) => key === 'name' ? r.c.name : key === 'last' ? (r.last ? r.last.date : '') : (r.next ? r.next.date : '');
+    rows.sort((a, b) => {
+      if (key === 'name') return a.c.name.localeCompare(b.c.name, undefined, { sensitivity: 'base' }) * mul || (a.c.id < b.c.id ? -1 : 1);
+      const av = val(a), bv = val(b);
+      if (av === bv) return a.c.id < b.c.id ? -1 : 1;
+      return av < bv ? -mul : mul; // empty (no date) always last regardless of dir
+    });
+
+    const total = rows.length;
+    const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (state.page > pages) state.page = pages;
+    const start = (state.page - 1) * PAGE_SIZE;
+    const pageRows = rows.slice(start, start + PAGE_SIZE);
+
+    view.querySelector('#custCount').textContent =
+      `${total} customer${total === 1 ? '' : 's'}${state.q ? ` · ${total} match${total === 1 ? '' : 'es'}` : ''}`;
+    qClear.style.display = state.q ? '' : 'none';
+
+    renderTable(pageRows, rows.length === 0 && !state.q);
+    renderCards(pageRows);
+
+    pager.innerHTML = '';
+    if (total > 0) {
+      pager.append(
+        U.el('span', { class: 'num', text: `Showing ${start + 1}–${Math.min(start + PAGE_SIZE, total)} of ${total} · Page ${state.page} of ${pages}` }),
+        U.el('span', { class: 'sp' }),
+        U.el('button', { class: 'btn secondary sm', type: 'button', text: '‹ Prev', disabled: state.page <= 1, onclick: () => { state.page--; draw(); } }),
+        U.el('button', { class: 'btn secondary sm', type: 'button', text: 'Next ›', disabled: state.page >= pages, onclick: () => { state.page++; draw(); } }),
+      );
+    } else pager.style.display = 'none';
+  }
+
+  function sortTh(key, labelText) {
+    const { key: sk, dir } = state.sort;
+    const th = U.el('th', { scope: 'col' });
+    const btn = U.el('button', {
+      class: 'sortbtn', type: 'button',
+      'aria-label': `Sort by ${labelText}`,
+      onclick: () => {
+        state.sort = sk === key ? { key, dir: dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' };
+        try { sessionStorage.setItem(LIST_SORT_KEY, JSON.stringify(state.sort)); } catch { /* private mode */ }
+        draw();
+      },
+    }, labelText, U.el('span', { class: 'arr num', text: sk === key ? (dir === 'asc' ? '▲' : '▼') : '' }));
+    th.append(btn);
+    if (sk === key) th.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : 'descending');
+    return th;
+  }
+
+  function renderTable(pageRows, isTrueEmpty) {
+    tableWrap.innerHTML = '';
+    if (isTrueEmpty) {
+      tableWrap.style.display = '';
+      tableWrap.append(U.el('div', { class: 'card' }, emptyState({
+        title: 'No customers yet',
+        body: 'Add your first customer to start tracking service history.',
+        cta: [{ label: 'Add customer', href: '#/customers/new' }],
+      })));
+      return;
+    }
+    tableWrap.style.display = '';
+    const noResults = pageRows.length === 0 && state.q;
+    const tbl = U.el('table', { class: 'tbl' },
+      U.el('caption', { class: 'sr-only', text: 'Customers, sortable by name, last service, and next scheduled service' }),
+      U.el('thead', null, U.el('tr', null,
+        sortTh('name', 'Customer'),
+        U.el('th', { scope: 'col', text: 'Vehicles' }),
+        sortTh('last', 'Last service'),
+        sortTh('next', 'Next up'),
+        U.el('th', { scope: 'col', 'aria-label': 'Actions', class: 'sr-only' })),
+      ),
+      U.el('tbody', null, pageRows.map((r) => {
+        const tr = U.el('tr', { class: 'rowlink', 'data-id': r.c.id, tabindex: '0' });
+        const cells = [];
+        cells.push(U.el('td', null,
+          U.el('a', { href: `#/customers/${r.c.id}`, text: r.c.name, onclick: (e) => { e.preventDefault(); go(`#/customers/${r.c.id}`); }, style: 'font-weight:500;' }),
+          U.el('div', { class: 'sub num', text: r.c.phone })));
+        cells.push(U.el('td', null, r.vs.length
+          ? (r.vs.length === 1 ? U.vehicleName(r.vs[0]) : r.vs.length <= 4 ? r.vs.map((v) => U.vehicleName(v)).join(', ') : `${r.vs.length} vehicles`)
+          : U.el('span', { class: 'dash', text: '—' })));
+        cells.push(U.el('td', null, r.last
+          ? U.el(null, null,
+              U.el('span', { class: 'num', text: U.full(r.last.date) }),
+              U.el('div', { class: 'sub', text: r.last.description }))
+          : U.el('span', { class: 'dash', text: '—' })));
+        cells.push(U.el('td', null, r.next
+          ? U.el('span', { class: 'num', text: U.full(r.next.date) })
+          : U.el('span', { class: 'dash', text: '—' })));
+        tr.append(...cells);
+        tr.addEventListener('click', (e) => { if (!e.target.closest('a,button')) go(`#/customers/${r.c.id}`); });
+        return tr;
+      })),
+    );
+    if (noResults) {
+      tableWrap.innerHTML = '';
+      const box = U.el('div', { class: 'card' },
+        U.el('div', { class: 'empty' },
+          U.el('div', { class: 'et' }, `No matches for “${state.q}”.`),
+          U.el('div', { class: 'row', style: 'border-top:none;' },
+            U.el('button', { class: 'btn secondary', type: 'button', onclick: () => { qInput.value = ''; state.q = ''; state.page = 1; draw(); qInput.focus(); } }, 'Clear search'),
+            U.el('a', { class: 'btn secondary', href: '#/customers/new', onclick: (e) => { e.preventDefault(); go('#/customers/new'); } }, 'Add customer'),
+          ),
+        ),
+      );
+      tableWrap.append(box);
+    } else {
+      tableWrap.append(tbl);
+      rovingRows(tableWrap, (id) => go(`#/customers/${id}`));
+    }
+  }
+
+  function renderCards(pageRows) {
+    cardStack.innerHTML = '';
+    cardStack.append(...pageRows.map((r) => {
+      const card = U.el('a', { class: 'mcard', href: `#/customers/${r.c.id}`, onclick: (e) => { e.preventDefault(); go(`#/customers/${r.c.id}`); } });
+      card.append(
+        U.el('div', { class: 't' }, r.c.name, U.el('span', { class: 'chev', 'aria-hidden': true, text: '›' })),
+        U.el('div', { class: 's num', text: r.c.phone }),
+        U.el('div', { class: 's' },
+          `${r.vs.length} vehicle${r.vs.length === 1 ? '' : 's'}${r.last ? ` · Last: ${U.full(r.last.date)} · ${U.money(r.last.total)}` : ''}${r.next ? ` · Next: ${U.full(r.next.date)}` : ''}`),
+      );
+      return card;
+    }));
+  }
+
+  qInput.addEventListener('input', U.debounce(() => {
+    state.q = qInput.value.trim();
+    state.page = 1;
+    draw();
+  }, 150));
+  qClear.addEventListener('click', () => {
+    qInput.value = '';
+    state.q = '';
+    state.page = 1;
+    draw();
+    qInput.focus();
+  });
+
+  tableWrap.style.display = 'none';
+  withLoad(view.querySelector('#cbody'), async () => {
+    view.querySelector('#cbody').innerHTML = '';
+    cache = await listData();
+    cache.customers = await api.getCustomers(); // name-sorted base
+    draw();
+  });
+});
+
+/* --------------------------- W3 customer detail -------------------- */
+
+registerScreen('customerDetail', (view, { id }) => {
+  const body = U.el('div', null);
+  view.append(body);
+
+  withLoad(body, async () => {
+    body.innerHTML = '';
+    let c;
+    try { c = await api.getCustomer(id); } catch (e) { if (e instanceof ApiError && e.code === 'not_found') return body.append(notFoundScreen(e.message)); throw e; }
+    const [vehicles, jobs] = await Promise.all([
+      api.getVehicles({ customerId: id }),
+      api.getJobs({ customerId: id, dir: 'date_desc' }),
+    ]);
+    const jobsByVeh = {};
+    jobs.forEach((j) => (jobsByVeh[j.vehicleId] = jobsByVeh[j.vehicleId] || []).unshift(j));
+
+    /* header */
+    const menu = U.el('div', { class: 'qamenu menu-r', role: 'menu' });
+    const menuWrap = U.el('div', { class: 'qamenu-wrap', style: 'position:relative; display:inline-block;' },
+      U.el('button', { class: 'iconbtn', type: 'button', 'aria-label': 'More actions', 'aria-haspopup': 'true', text: '⋯', onclick: (e) => {
+        e.stopPropagation();
+        const open = menu.classList.toggle('open');
+        if (open) {
+          menu.innerHTML = '';
+          menu.append(
+            menuItem('Add vehicle', `#/customers/${id}/vehicles/new`),
+            menuItem('New service job', `#/jobs/new?customer=${id}`),
+            U.el('div', { class: 'sep', style: 'border-top:1px solid var(--border); margin:4px 0;' }),
+            U.el('a', { class: 'mi', role: 'menuitem', style: 'color:var(--danger);', href: '#', onclick: (e) => { e.preventDefault(); close(); askDeleteCustomer(); } }, 'Delete customer'),
+          );
+          menu.querySelector('.mi').focus();
+        }
+      } }),
+      menu,
+    );
+    function close() { menu.classList.remove('open'); }
+    document.addEventListener('click', function h(e) { if (!menuWrap.contains(e.target)) { close(); document.removeEventListener('click', h); } });
+
+    body.append(
+      U.el('div', { class: 'crumbs' }, U.el('a', { href: '#/customers', onclick: (e) => { e.preventDefault(); go('#/customers'); } }, 'Customers'),
+        U.el('span', { class: 'sep', 'aria-hidden': true, text: '/' }),
+        c.name),
+      U.el('div', { class: 'bar' },
+        U.el('h1', { text: c.name }),
+        U.el('span', { class: 'sp' }),
+        U.el('a', { class: 'btn secondary', href: `#/customers/${id}/edit`, onclick: (e) => { e.preventDefault(); go(`#/customers/${id}/edit`); } }, 'Edit'),
+        menuWrap,
+      ),
+      U.el('div', { class: 'meta', style: 'font-size:13px; margin-bottom:18px;', text: [c.phone, c.email || '—', c.address || ''].filter(Boolean).join(' · ') }),
+    );
+
+    /* vehicles */
+    const vhead = U.el('div', { class: 'ct', style: 'font-size:15px; font-weight:600; margin:22px 0 10px; display:flex; align-items:center; gap:10px;' },
+      `Vehicles (${vehicles.length})`, U.el('span', { class: 'sp' }),
+      U.el('a', { class: 'btn secondary sm', href: `#/customers/${id}/vehicles/new`, onclick: (e) => { e.preventDefault(); go(`#/customers/${id}/vehicles/new`); } }, 'Add vehicle'));
+    body.append(vhead);
+
+    const vgrid = U.el('div', { class: 'vgrid' });
+    if (!vehicles.length) {
+      body.append(U.el('div', { class: 'card' },
+        U.el('div', { class: 'empty' },
+          U.el('div', { class: 'et', text: 'No vehicles yet' }),
+          U.el('div', { class: 'row', style: 'border-top:none;' },
+            U.el('a', { class: 'btn primary', href: `#/customers/${id}/vehicles/new`, onclick: (e) => { e.preventDefault(); go(`#/customers/${id}/vehicles/new`); } }, 'Add vehicle')))));
+    } else {
+      const shown = vehicles.slice(0, 4);
+      const rest = vehicles.slice(4);
+      shown.forEach((v) => vgrid.append(vehicleCard(v, (jobsByVeh[v.id] || [])[0] || null)));
+      if (rest.length) {
+        const holder = U.el('div', { class: 'vrest' });
+        const moreBtn = U.el('button', { class: 'btn secondary sm', type: 'button', text: `Show all ${vehicles.length}`, onclick: () => {
+          holder.append(...rest.map((v) => vehicleCard(v, (jobsByVeh[v.id] || [])[0] || null)));
+          holder.remove();
+          moreBtn.remove();
+        } });
+        body.append(moreBtn, holder);
+      }
+      body.append(vgrid);
+    }
+
+    /* service history */
+    const histBody = U.el('div', null);
+    const filterSel = U.el('select', { class: 'inp', style: 'width:auto; min-width:170px; height:34px; font-size:13.5px;', 'aria-label': 'Filter history by vehicle' },
+      U.el('option', { value: '', text: 'All vehicles' }),
+      ...vehicles.map((v) => U.el('option', { value: v.id, text: U.vehicleName(v) })));
+    const hhead = U.el('div', { class: 'ct', style: 'font-size:15px; font-weight:600; margin:22px 0 10px; display:flex; align-items:center; gap:10px;' },
+      `Service history (${jobs.length})`, U.el('span', { class: 'sp' }), filterSel);
+    body.append(hhead, histBody);
+
+    function drawHistory() {
+      histBody.innerHTML = '';
+      const fv = filterSel.value;
+      const list = fv ? jobs.filter((j) => j.vehicleId === fv) : jobs;
+      if (!list.length) {
+        histBody.append(U.el('div', { class: 'card' },
+          U.el('div', { class: 'empty' },
+            U.el('div', { class: 'et', text: 'No service yet' }),
+            U.el('div', { class: 'row', style: 'border-top:none;' },
+              U.el('a', { class: 'btn primary', href: `#/jobs/new?customer=${id}`, onclick: (e) => { e.preventDefault(); go(`#/jobs/new?customer=${id}`); } }, 'New service job')))));
+        return;
+      }
+      const vehById = {};
+      vehicles.forEach((v) => vehById[v.id] = v);
+      const tl = U.el('div', { class: 'tl' });
+      let year = null;
+      list.forEach((j) => {
+        const y = (j.date || '').slice(0, 4);
+        if (y !== year) {
+          year = y;
+          tl.append(U.el('div', { class: 'yhead', text: y }));
+        }
+        tl.append(timelineEntry(j, { showVehicle: !fv, vehName: vehById[j.vehicleId] ? U.vehicleName(vehById[j.vehicleId]) : j.vehicleId }));
+      });
+      histBody.append(tl);
+    }
+    filterSel.addEventListener('change', drawHistory);
+    drawHistory();
+
+    /* notes */
+    if (c.notes) {
+      body.append(U.el('section', { class: 'card', 'aria-label': 'Notes' },
+        U.el('div', { class: 'ct' }, 'Notes', U.el('span', { class: 'sp' }),
+          U.el('a', { href: `#/customers/${id}/edit`, onclick: (e) => { e.preventDefault(); go(`#/customers/${id}/edit`); } }, 'Edit')),
+        U.el('p', { style: 'font-size:14px; color:var(--ink-soft);', text: c.notes })));
+    }
+
+    /* delete customer */
+    async function askDeleteCustomer() {
+      const vCount = vehicles.length, jCount = jobs.length;
+      if (jCount) {
+        confirmDialog({
+          title: 'Delete customer',
+          body: U.el('span', null,
+            `${c.name} has ${jCount} service job${jCount === 1 ? '' : 's'}${vCount ? ` and ${vCount} vehicle${vCount === 1 ? '' : 's'}` : ''}. `),
+          confirmLabel: 'OK', danger: false,
+          onConfirm: null,
+        });
+        // spec: blocked while jobs exist — the dialog explains, no confirm
+        return;
+      }
+      confirmDialog({
+        title: 'Delete customer',
+        body: U.el('span', null,
+          `Delete ${c.name}?${vCount ? ` This also deletes ${vCount} vehicle${vCount === 1 ? '' : 's'}.` : ''} This cannot be undone.`),
+        confirmLabel: 'Delete customer', danger: true,
+        onConfirm: async () => {
+          try {
+            // remove vehicles first (customer delete is blocked while any remain)
+            for (const v of vehicles) await api.deleteVehicle(v.id);
+            await api.deleteCustomer(id);
+            toast('Customer deleted');
+            go('#/customers');
+          } catch (e) {
+            toast(e instanceof ApiError ? e.message : 'Could not delete customer.', 'error');
+          }
+        },
+      });
+    }
+  });
+
+  function vehicleCard(v, lastJob) {
+    const card = U.el('a', { class: 'vcard', href: `#/vehicles/${v.id}`, onclick: (e) => { e.preventDefault(); go(`#/vehicles/${v.id}`); }, 'aria-label': `Edit ${U.vehicleName(v)}` });
+    card.append(
+      U.el('div', { class: 'vn', text: U.vehicleName(v) }),
+      U.el('div', { class: 'vm' },
+        v.plate ? U.el('span', { class: 'plate', text: v.plate }) : null,
+        U.el('span', { class: 'num', text: `${U.int(v.mileage)} mi` })),
+      lastJob
+        ? U.el('div', { class: 'vm' }, U.el('span', { class: 'meta num', text: `Last: ${lastJob.description} — ${U.full(lastJob.date)} · ${U.money(lastJob.total)}` }))
+        : null,
+    );
+    return card;
+  }
+
+  function timelineEntry(j, { showVehicle, vehName }) {
+    const ex = Overlay.jobEx(j.id);
+    const exp = U.el('div', { class: 'tlx' },
+      U.el('div', null,
+        U.el('div', { class: 'detail' },
+          U.el('div', { class: 'kv' },
+            showVehicle ? U.el(null, null, U.el('span', { class: 'k', text: 'Vehicle' }), U.el('span', { class: 'v', text: vehName })) : null,
+            U.el(null, null, U.el('span', { class: 'k', text: label('technician') }), U.el('span', { class: 'v', text: j.technician || '—' })),
+            U.el(null, null, U.el('span', { class: 'k', text: label('labor') }), U.el('span', { class: 'v num', text: U.money(j.labor) })),
+            U.el(null, null, U.el('span', { class: 'k', text: label('parts') }), U.el('span', { class: 'v num', text: U.money(j.parts) })),
+            U.el(null, null, U.el('span', { class: 'k', text: label('total') }), U.el('span', { class: 'v num', text: U.money(j.total) })),
+            ex && ex.mileage != null ? U.el(null, null, U.el('span', { class: 'k', text: label('mileage') }), U.el('span', { class: 'v num', text: `${U.int(ex.mileage)} mi` })) : null,
+          ),
+          j.notes ? U.el('div', { class: 'notes', text: j.notes }) : null,
+          U.el('div', { style: 'margin-top:10px; text-align:right;' },
+            U.el('a', { class: 'btn ghost sm', href: `#/jobs/${j.id}`, onclick: (e) => { e.preventDefault(); go(`#/jobs/${j.id}`); } }, 'Open job')),
+        ),
+      ),
+    );
+    const row = U.el('div', { class: 'te', role: 'button', tabindex: '0', 'aria-expanded': 'false' });
+    row.append(
+      U.el('span', { class: 'd num', text: U.full(j.date) }),
+      U.el('div', { style: 'min-width:0;' },
+        U.el('div', { class: 'sum' }, j.description, ' ', chip(jobStatus(j))),
+        U.el('div', { class: 'sub' },
+          j.technician ? `${j.technician}${ex && ex.mileage != null ? ` · ${U.int(ex.mileage)} mi` : ''}` : (ex && ex.mileage != null ? `${U.int(ex.mileage)} mi` : ''))),
+      U.el('span', { class: 'tot num', text: U.money(j.total) }),
+      U.el('span', { class: 'exp num', text: 'Open · +' }),
+      exp,
+    );
+    const toggle = () => {
+      const open = row.classList.toggle('open');
+      row.setAttribute('aria-expanded', String(open));
+      row.querySelector('.exp').textContent = open ? 'Close · –' : 'Open · +';
+    };
+    row.addEventListener('click', (e) => { if (!e.target.closest('a,button')) toggle(); });
+    row.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+    return row;
+  }
+
+  function menuItem(text, hash) {
+    return U.el('a', { class: 'mi', role: 'menuitem', href: hash, onclick: (e) => { e.preventDefault(); go(hash); } }, text);
+  }
+});
+
+/* --------------------------- W4 customer form ---------------------- */
+
+registerScreen('customerForm', (view, { id }) => {
+  const isEdit = !!id;
+  view.append(
+    U.el('div', { class: 'crumbs' },
+      U.el('a', { href: '#/customers', onclick: (e) => { e.preventDefault(); go('#/customers'); } }, 'Customers'),
+      U.el('span', { class: 'sep', 'aria-hidden': true, text: '/' }),
+      isEdit ? 'Edit' : 'New'),
+    U.el('div', { class: 'bar' }, U.el('h1', { text: isEdit ? 'Edit customer' : 'New customer' })),
+  );
+  const holder = U.el('div', null);
+  view.append(holder);
+
+  withLoad(holder, async () => {
+    holder.innerHTML = '';
+    let c = null;
+    if (isEdit) {
+      try { c = await api.getCustomer(id); } catch (e) { if (e instanceof ApiError && e.code === 'not_found') return holder.append(notFoundScreen(e.message)); throw e; }
+    }
+    const kit = new FormKit({ submitLabel: 'Save customer', cancelHref: isEdit ? `#/customers/${id}` : '#/customers',
+      onSubmit: async (v) => {
+        const input = {
+          name: v.name.trim(),
+          phone: v.phone.trim(),
+          email: v.email.trim(),
+          address: v.address.trim(),
+          notes: v.notes,
+        };
+        const saved = isEdit ? await api.updateCustomer(id, input) : await api.createCustomer(input);
+        return { toast: isEdit ? 'Customer saved' : 'Customer added', go: `#/customers/${saved.id}` };
+      } });
+
+    kit.makeField({ name: 'name', lbl: label('name'), required: true, type: 'text', maxlength: 120, placeholder: 'Maria Delgado',
+      attrs: { value: c ? c.name : '' },
+      validate: (v) => (String(v).trim() ? null : 'Enter a name.') });
+    const phoneF = kit.makeField({ name: 'phone', lbl: label('phone'), required: true, type: 'tel', maxlength: 20, inputmode: 'tel',
+      placeholder: '(719) 555-0142', attrs: { value: c ? c.phone : '' },
+      hint: 'Include area code, e.g. (719) 555-0142',
+      validate: (v) => {
+        const s = String(v).trim();
+        if (!s) return 'Enter a phone number with at least 7 digits.';
+        if (!/^[+()\-.:\s\d]{7,20}$/.test(s)) return 'Enter a phone number with at least 7 digits.';
+        if ((s.match(/\d/g) || []).length < 7) return 'Enter a phone number with at least 7 digits.';
+        return null;
+      } });
+    kit.makeField({ name: 'email', lbl: label('email'), type: 'email', maxlength: 200,
+      placeholder: 'name@example.com', attrs: { value: c ? c.email : '' },
+      hint: 'Optional — format-checked only when filled.',
+      validate: (v) => (String(v).trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v).trim()) ? 'Enter a valid email address.' : null) });
+    kit.makeField({ name: 'address', lbl: label('address'), type: 'text', maxlength: 200,
+      placeholder: '214 County Rd 107, Alamosa CO 81101', attrs: { value: c ? c.address : '' },
+      validate: (v) => (String(v).length > 200 ? 'Address is too long (max 200).' : null) });
+    const notesC = counterEl({ showAt: 1600, max: 2000 });
+    const notesF = kit.makeField({ name: 'notes', lbl: label('notes'), type: 'text', attrs: { value: '' }, extra: notesC.node,
+      validate: (v) => (String(v).length > 2000 ? 'Notes are too long (max 2,000 characters).' : null) });
+    // notes as textarea:
+    const notesTa = U.el('textarea', { class: 'inp', rows: 4, maxlength: 2000, id: notesF.input.id, 'aria-label': label('notes') });
+    notesTa.value = c ? c.notes : '';
+    notesF.input.replaceWith(notesTa);
+    notesF.input = notesTa;
+    notesTa.addEventListener('input', () => kit.touch());
+    notesTa.addEventListener('blur', () => { if (notesF.touched !== true) { notesF.touched = true; notesF.validate(notesF.value()); } });
+    notesC.bind(notesTa);
+
+    holder.append(kit.root);
+    kit.snapshotNow();
+    window.__crmFormPreserve = () => { if (kit.isDirty()) setDirty(true); };
+    // wire preserve on any pending navigation
+    setDirty(false);
+    kit.root.addEventListener('input', () => setDirty(kit.isDirty()));
+    const first = kit.fields.get('name').input;
+    setTimeout(() => first.focus(), 60);
+  });
+});
+
+/* --------------------------- W5 vehicle form ----------------------- */
+
+registerScreen('vehicleForm', (view, { id, query }) => {
+  const isEdit = !!id;
+  const lockCustomer = !isEdit && query && query.get('customer'); // from customer detail route
+  view.append(
+    U.el('div', { class: 'crumbs' },
+      U.el('a', { href: '#/customers', onclick: (e) => { e.preventDefault(); go('#/customers'); } }, 'Customers'),
+      U.el('span', { class: 'sep', 'aria-hidden': true, text: '/' }),
+      U.el('a', { href: lockCustomer ? `#/customers/${lockCustomer}` : null, onclick: (e) => { e.preventDefault(); if (lockCustomer) go(`#/customers/${lockCustomer}`); }, text: lockCustomer ? 'Customer' : 'Vehicles' }),
+      U.el('span', { class: 'sep', 'aria-hidden': true, text: '/' }),
+      isEdit ? 'Edit' : 'New'),
+    U.el('div', { class: 'bar' }, U.el('h1', { text: isEdit ? 'Edit vehicle' : 'New vehicle' })),
+  );
+  const holder = U.el('div', null);
+  view.append(holder);
+
+  withLoad(holder, async () => {
+    holder.innerHTML = '';
+    let v = null;
+    if (isEdit) {
+      try { v = await api.getVehicle(id); } catch (e) { if (e instanceof ApiError && e.code === 'not_found') return holder.append(notFoundScreen(e.message)); throw e; }
+    }
+    const customers = await api.getCustomers();
+    const custById = {};
+    customers.forEach((c) => custById[c.id] = c);
+    const customerId = isEdit ? v.customerId : lockCustomer;
+
+    const kit = new FormKit({ submitLabel: 'Save vehicle', cancelHref: customerId ? `#/customers/${customerId}` : '#/customers',
+      dangerExtra: isEdit ? U.el('button', {
+        class: 'btn danger-ghost', type: 'button', text: 'Delete vehicle',
+        onclick: () => askDeleteVehicle(),
+      }) : null,
+      onSubmit: async (val) => {
+        const input = {
+          make: val.make.trim(),
+          model: val.model.trim(),
+          year: Number(val.year),
+          vin: val.vin.trim().toUpperCase(),
+          plate: val.plate.trim().toUpperCase(),
+        };
+        if (val.mileage !== '') input.mileage = Number(val.mileage);
+        if (!isEdit) input.customerId = val.customer;
+        else if (val.customer && val.customer !== customerId) input.customerId = val.customer;
+        const saved = isEdit ? await api.updateVehicle(id, input) : await api.createVehicle(input);
+        return { toast: isEdit ? 'Vehicle saved' : 'Vehicle added', go: `#/customers/${saved.customerId}` };
+      } });
+
+    if (isEdit) {
+      kit.form.append(U.el('div', { class: 'lockrow' },
+        'Customer: ', U.el('b', { text: custById[v.customerId] ? custById[v.customerId].name : v.customerId }),
+        U.el('span', { class: 'lk', text: '— change below if the vehicle moved' })));
+      kit.makeField({ name: 'customer', lbl: 'Customer', type: 'text', attrs: { value: v.customerId, readonly: true }, validate: () => null });
+      kit.fields.get('customer').input.closest('.field').style.display = 'none';
+    } else if (lockCustomer) {
+      kit.form.append(U.el('div', { class: 'lockrow' },
+        'Customer: ', U.el('b', { text: custById[lockCustomer] ? custById[lockCustomer].name : lockCustomer }),
+        U.el('span', { class: 'lk', text: '— locked (opened from this customer’s page)' })));
+      kit.makeField({ name: 'customer', lbl: 'Customer', type: 'text', attrs: { value: lockCustomer, readonly: true }, validate: () => null });
+      kit.fields.get('customer').input.closest('.field').style.display = 'none';
+    } else {
+      const custF = kit.makeField({ name: 'customer', lbl: 'Customer', type: 'text', required: true, validate: (v) => (v ? null : 'Choose a customer.') });
+      // swap hidden input for a real select
+      const sel = U.el('select', { class: 'inp', id: custF.input.id },
+        U.el('option', { value: '', text: 'Choose a customer…' }),
+        ...customers.map((c) => U.el('option', { value: c.id, text: c.name })));
+      custF.input.replaceWith(sel);
+      custF.input = sel;
+      sel.addEventListener('input', () => kit.touch());
+      sel.addEventListener('blur', () => { if (custF.touched !== true) { custF.touched = true; custF.validate(custF.value()); } });
+    }
+
+    const maxYear = new Date().getFullYear() + 1;
+    kit.makeField({ name: 'year', lbl: label('year'), required: true, type: 'number', inputmode: 'numeric',
+      attrs: { value: v ? String(v.year) : '', min: '1900', max: String(maxYear) },
+      validate: (val) => {
+        const n = parseNumStr(val);
+        if (val === '' || n === null || !Number.isInteger(n)) return `Enter a year between 1900 and ${maxYear}.`;
+        if (n < 1900 || n > maxYear) return `Enter a year between 1900 and ${maxYear}.`;
+        return null;
+      } });
+    kit.makeField({ name: 'make', lbl: label('make'), required: true, type: 'text', maxlength: 60,
+      attrs: { value: v ? v.make : '' }, validate: (val) => (String(val).trim() ? null : 'Enter a make.') });
+    kit.makeField({ name: 'model', lbl: label('model'), required: true, type: 'text', maxlength: 60,
+      attrs: { value: v ? v.model : '' }, validate: (val) => (String(val).trim() ? null : 'Enter a model.') });
+
+    const vinF = kit.makeField({ name: 'vin', lbl: label('vin'), required: true, type: 'text', maxlength: 17, mono: true, inputmode: 'text',
+      attrs: { value: v ? v.vin : '', autocomplete: 'off' },
+      hint: 'Exactly 17 characters — I, O, Q not used.',
+      validate: (val) => {
+        const s = String(val).trim().toUpperCase();
+        if (!s) return 'Enter a VIN (17 characters).';
+        return /^[A-HJ-NPR-Z0-9]{17}$/.test(s) ? null : 'VIN must be 17 characters (I, O, Q not used).';
+      } });
+    vinF.input.addEventListener('input', () => {
+      vinF.input.value = vinF.input.value.toUpperCase().replace(/[^A-Z0-9]/gi, '');
+    });
+    const plateF = kit.makeField({ name: 'plate', lbl: label('plate'), required: true, type: 'text', maxlength: 12, mono: true,
+      attrs: { value: v ? v.plate : '', autocomplete: 'off' },
+      validate: (val) => {
+        const s = String(val).trim();
+        if (!s) return 'Enter a license plate.';
+        return s.length > 12 ? 'Plate is too long (max 12).' : null;
+      } });
+    plateF.input.addEventListener('input', () => { plateF.input.value = plateF.input.value.toUpperCase(); });
+
+    const mileF = kit.makeField({ name: 'mileage', lbl: label('mileage'), type: 'number', inputmode: 'numeric',
+      attrs: { value: v && v.mileage ? String(v.mileage) : '', min: '0', max: '999999' },
+      hint: 'Odometer at last visit.',
+      validate: (val) => {
+        if (val === '') return null;
+        const n = parseNumStr(val);
+        if (n === null || !Number.isInteger(n) || n < 0 || n > 999999) return 'Mileage must be 0–999,999.';
+        return null;
+      } });
+    mileF.input.addEventListener('blur', () => {
+      const n = parseNumStr(mileF.input.value);
+      if (n !== null && Number.isInteger(n) && n >= 0) mileF.input.value = String(n);
+    });
+
+    // live display-name preview
+    const preview = U.el('div', { class: 'hint', style: 'margin-top:4px;' });
+    const updPreview = () => {
+      const yr = parseNumStr(kit.fields.get('year').value());
+      const mk = kit.fields.get('make').value().trim();
+      const md = kit.fields.get('model').value().trim();
+      preview.textContent = (yr || mk || md) ? `Display name: ${[String(yr || ''), mk, md].filter(Boolean).join(' ')}` : '';
+    };
+    ['year', 'make', 'model'].forEach((k) => kit.fields.get(k).input.addEventListener('input', updPreview));
+    kit.form.append(preview);
+    updPreview();
+
+    holder.append(kit.root);
+    kit.snapshotNow();
+    setDirty(false);
+    kit.root.addEventListener('input', () => setDirty(kit.isDirty()));
+
+    async function askDeleteVehicle() {
+      const jobs = await api.getJobs({ vehicleId: id });
+      if (jobs.length) {
+        confirmDialog({
+          title: 'Delete vehicle',
+          body: U.el('span', null, `This vehicle has ${jobs.length} service job${jobs.length === 1 ? '' : 's'}. Delete or reassign those jobs first.`),
+          confirmLabel: 'OK',
+        });
+        return;
+      }
+      confirmDialog({
+        title: 'Delete vehicle',
+        body: U.el('span', null, `Delete ${U.vehicleName(v)}? This cannot be undone.`),
+        confirmLabel: 'Delete vehicle', danger: true,
+        onConfirm: async () => {
+          try {
+            await api.deleteVehicle(id);
+            toast('Vehicle deleted');
+            go(`#/customers/${v.customerId}`);
+          } catch (e) {
+            toast(e instanceof ApiError ? e.message : 'Could not delete vehicle.', 'error');
+          }
+        },
+      });
+    }
+  });
+});
+
+/* ----------------------------- W6 job form ------------------------- */
+
+const JOB_DRAFTS = {};
+
+registerScreen('jobForm', (view, { id, query }) => {
+  const isEdit = !!id;
+  const presetCustomer = query ? query.get('customer') : null;
+  const presetVehicle = query ? query.get('vehicle') : null;
+  const draftKey = isEdit ? `edit:${id}` : 'new';
+
+  view.append(
+    U.el('div', { class: 'crumbs' },
+      U.el('a', { href: '#/dashboard', onclick: (e) => { e.preventDefault(); go('#/dashboard'); } }, 'Dashboard'),
+      U.el('span', { class: 'sep', 'aria-hidden': true, text: '/' }),
+      isEdit ? 'Edit job' : 'New job'),
+    U.el('div', { class: 'bar' }, U.el('h1', { id: 'jobTitle', text: isEdit ? 'Edit job' : 'New service job' })),
+  );
+  const holder = U.el('div', null);
+  view.append(holder);
+
+  withLoad(holder, async () => {
+    holder.innerHTML = '';
+    let job = null;
+    if (isEdit) {
+      try { job = await api.getJob(id); } catch (e) { if (e instanceof ApiError && e.code === 'not_found') return holder.append(notFoundScreen(e.message)); throw e; }
+    }
+    const [customers, vehicles] = await Promise.all([api.getCustomers(), api.getVehicles()]);
+    const custById = {};
+    customers.forEach((c) => custById[c.id] = c);
+    const vehById = {};
+    vehicles.forEach((v) => vehById[v.id] = v);
+    let vehList = vehicles.filter((v) => v.customerId === (job ? job.customerId : presetCustomer));
+    let startCustomer = job ? job.customerId : (presetCustomer || (presetVehicle ? vehById[presetVehicle].customerId : null));
+
+    /* technicians for the datalist (top 5 by usage) */
+    const techs = await api.getJobs();
+    const tcount = {};
+    techs.forEach((j) => { if (j.technician) tcount[j.technician] = (tcount[j.technician] || 0) + 1; });
+    const techList = Object.keys(tcount).sort((a, b) => tcount[b] - tcount[a]).slice(0, 5);
+    const dl = U.el('datalist', { id: 'techList' }, ...techList.map((t) => U.el('option', { value: t })));
+
+    const ex = job ? Overlay.jobEx(job.id) : null;
+    const st = {
+      statusTouched: isEdit, // on create we auto-derive from the date
+    };
+
+    const kit = new FormKit({
+      wide: true,
+      submitLabel: 'Save job',
+      cancelHref: job ? (custById[job.customerId] ? `#/customers/${job.customerId}` : '#/dashboard') : (presetCustomer ? `#/customers/${presetCustomer}` : '#/dashboard'),
+      dangerExtra: isEdit ? U.el('button', { class: 'btn danger-ghost', type: 'button', text: 'Delete job', onclick: () => askDeleteJob() }) : null,
+      onSubmit: async (v) => {
+        const input = {
+          date: v.date,
+          description: v.description.trim(),
+          labor: v.labor === '' ? 0 : Number(v.labor),
+          parts: v.parts === '' ? 0 : Number(v.parts),
+          technician: v.technician.trim(),
+          notes: v.notes,
+        };
+        const richStatus = v.status;
+        input.status = isCustomStatus(richStatus) ? coarseForRich(richStatus) : richStatus;
+        if (isEdit) {
+          input.customerId = job.customerId;
+          input.vehicleId = v.vehicle;
+        } else {
+          input.customerId = v.customer;
+          input.vehicleId = v.vehicle;
+        }
+        const saved = isEdit ? await api.updateJob(id, input) : await api.createJob(input);
+        // rich extras live in the overlay
+        Overlay.setJobEx(saved.id, {
+          status: richStatus,
+          serviceType: v.serviceType,
+          ...(v.mileage !== '' && Number(v.mileage) > 0 ? { mileage: Number(v.mileage) } : {}),
+        });
+        // higher odometer becomes the vehicle's reading
+        if (v.mileage !== '') {
+          const vm = parseNumStr(v.mileage);
+          const veh = vehById[saved.vehicleId] || await api.getVehicle(saved.vehicleId);
+          if (Number.isInteger(vm) && vm > (veh.mileage || 0)) {
+            try { await api.updateVehicle(saved.vehicleId, { mileage: vm }); } catch { /* non-fatal */ }
+          }
+        }
+        const statusChanged = job && job.status !== richStatus;
+        return {
+          toast: statusChanged && richStatus === 'completed' ? 'Job marked completed' : isEdit ? 'Job saved' : 'Job added',
+          go: `#/customers/${saved.customerId}`,
+        };
+      },
+    });
+
+    /* Vehicle section */
+    kit.form.append(U.el('div', { class: 'sec-t', text: 'Vehicle' }));
+    const grid1 = U.el('div', { class: 'fieldgrid' });
+
+    let custSel;
+    if (presetCustomer && !isEdit) {
+      const f = kit.makeField({ name: 'customer', lbl: 'Customer', type: 'text', required: true, attrs: { value: presetCustomer, readonly: true }, validate: () => null });
+      custSel = f;
+      kit.form.append(U.el('div', { class: 'lockrow' },
+        'Customer: ', U.el('b', { text: custById[presetCustomer] ? custById[presetCustomer].name : presetCustomer }),
+        U.el('span', { class: 'lk', text: '— locked (opened from this customer’s page)' })));
+      f.input.closest('.field').style.display = 'none';
+    } else if (isEdit) {
+      const f = kit.makeField({ name: 'customer', lbl: 'Customer', type: 'text', required: true, attrs: { value: job.customerId, readonly: true }, validate: () => null });
+      custSel = f;
+      kit.form.append(U.el('div', { class: 'lockrow' },
+        'Customer: ', U.el('b', { text: custById[job.customerId] ? custById[job.customerId].name : job.customerId }),
+        U.el('span', { class: 'lk', text: '— locked for this job' })));
+      f.input.closest('.field').style.display = 'none';
+    } else {
+      const f = kit.makeField({ name: 'customer', lbl: 'Customer', type: 'text', required: true, validate: (v) => (v ? null : 'Choose a customer.') });
+      custSel = f;
+    }
+    if (!custSel.input.disabled) {
+      const sel = U.el('select', { class: 'inp', id: custSel.input.id },
+        U.el('option', { value: '', text: 'Choose a customer…' }),
+        ...customers.map((c) => U.el('option', { value: c.id, text: c.name })));
+      custSel.input.replaceWith(sel);
+      custSel.input = sel;
+      sel.value = startCustomer || '';
+      sel.addEventListener('change', () => {
+        refreshVehicles();
+        kit.touch();
+      });
+      sel.addEventListener('input', () => kit.touch());
+      sel.addEventListener('blur', () => { if (custSel.touched !== true) { custSel.touched = true; custSel.validate(custSel.value()); } });
+    }
+    grid1.append(custSel.input.closest('.field'));
+
+    const vehF = kit.makeField({ name: 'vehicle', lbl: 'Vehicle', type: 'text', required: true, validate: (v) => (v ? null : 'Choose a vehicle for this customer.') });
+    const vehSelEl = U.el('select', { class: 'inp', id: vehF.input.id });
+    const vehLink = U.el('a', { href: '#', style: 'display:none;', onclick: (e) => {
+      e.preventDefault();
+      saveDraft();
+      const cid = custSel.input.value;
+      if (cid) go(`#/customers/${cid}/vehicles/new`);
+    } }, 'Add a vehicle first');
+    vehF.input.replaceWith(vehSelEl);
+    vehF.input = vehSelEl;
+    vehSelEl.addEventListener('input', () => kit.touch());
+    vehSelEl.addEventListener('blur', () => { if (vehF.touched !== true) { vehF.touched = true; vehF.validate(vehF.value()); } });
+    grid1.append(vehF.input.closest('.field'), U.el('div', { class: 'field' }, vehLink));
+
+    function refreshVehicles() {
+      const cid = custSel.input ? custSel.input.value : null;
+      vehList = vehicles.filter((v) => v.customerId === cid);
+      vehSelEl.innerHTML = '';
+      vehSelEl.append(
+        U.el('option', { value: '', text: vehList.length ? 'Choose a vehicle…' : 'No vehicles for this customer yet' }),
+        ...vehList.map((v) => U.el('option', { value: v.id, text: U.vehicleName(v) })),
+      );
+      vehLink.style.display = vehList.length === 0 && cid ? '' : 'none';
+    }
+    refreshVehicles();
+    vehSelEl.value = (job ? job.vehicleId : presetVehicle) || '';
+    if (vehSelEl.value && !vehSelEl.selectedOptions[0]) {
+      // selected option not present (stale) — clear
+      vehSelEl.value = '';
+    }
+
+    const dateF = kit.makeField({ name: 'date', lbl: label('date'), required: true, type: 'date',
+      attrs: { value: job ? job.date : U.todayISO(), min: '1990-01-01', max: U.addDaysISO(U.todayISO(), 90) },
+      hint: 'Future = scheduled; allowed to 90 days out.',
+      validate: (val) => {
+        if (!val) return 'Date is required.';
+        if (!U.parseDate(val)) return 'Enter a real date (YYYY-MM-DD).';
+        const min = '1990-01-01', max = U.addDaysISO(U.todayISO(), 90);
+        if (val < min) return 'Date is outside the allowed range (1990-01-01 or later).';
+        if (val > max) return 'Date is more than 3 months out.';
+        return null;
+      } });
+    dateF.input.addEventListener('change', () => {
+      if (!st.statusTouched) {
+        const future = dateF.value > U.todayISO();
+        const next = future ? 'open' : 'in_progress';
+        if (coarseStatuses().includes(next)) statusSel.value = next;
+      }
+      kit.touch();
+    });
+    grid1.append(dateF.input.closest('.field'));
+
+    const statusSel = U.el('select', { class: 'inp', id: 'f-status' },
+      ...allStatuses().map((s) => U.el('option', { value: s, text: isCustomStatus(s) ? s : statusTitle(s) })));
+    statusSel.value = job ? jobStatus(job) : (dateF.value > U.todayISO() ? 'open' : 'in_progress');
+    if (!allStatuses().includes(statusSel.value)) statusSel.value = coarseStatuses()[0] || '';
+    const statusF = { name: 'status', input: statusSel, labelEl: null, errEl: null,
+      value: () => statusSel.value, setErr: (m) => {}, clearErr: () => {}, validate: () => null,
+      touched: true };
+    kit.field(statusF);
+    statusSel.addEventListener('change', () => { st.statusTouched = true; kit.touch(); });
+    const statusFieldWrap = U.el('div', { class: 'field' },
+      U.el('div', { class: 'lr' }, U.el('label', { for: 'f-status' }, label('status'), U.el('span', { class: 'req', 'aria-hidden': true, text: ' *' }))),
+      statusSel,
+      U.el('div', { class: 'hint', text: 'Auto: Open if the date is future, In Progress if today or past.' }));
+    grid1.append(statusFieldWrap);
+
+    /* Work section */
+    kit.form.append(grid1, U.el('div', { class: 'sec-t', text: 'Work' }));
+    const grid2 = U.el('div', { class: 'fieldgrid' });
+    const typeF = kit.makeField({ name: 'serviceType', lbl: 'Service type', type: 'text', required: true, validate: (v) => (v ? null : 'Choose a service type.') });
+    const typeSel = U.el('select', { class: 'inp', id: typeF.input.id },
+      U.el('option', { value: '', text: 'Choose a service type…' }),
+      ...serviceTypes().map((t) => U.el('option', { value: t, text: typeTitle(t) })));
+    typeSel.value = ex ? (ex.serviceType || '') : '';
+    typeF.input.replaceWith(typeSel);
+    typeF.input = typeSel;
+    typeSel.addEventListener('input', () => kit.touch());
+    typeSel.addEventListener('blur', () => { if (typeF.touched !== true) { typeF.touched = true; typeF.validate(typeF.value()); } });
+    grid2.append(typeF.input.closest('.field'));
+
+    const techF = kit.makeField({ name: 'technician', lbl: 'Technician', type: 'text', maxlength: 60, list: 'techList',
+      attrs: { value: job ? job.technician : '' },
+      hint: 'Free text + suggestions from recent jobs.',
+      validate: (v) => (String(v).length > 60 ? 'Technician is too long (max 60).' : null) });
+    grid2.append(techF.input.closest('.field'), dl);
+    kit.form.append(grid2);
+
+    const descC = counterEl({ showAt: 800, max: 1000 });
+    const descF = kit.makeField({ name: 'description', lbl: 'Description', required: true, type: 'text',
+      attrs: { value: job ? job.description : '' }, extra: descC.node,
+      validate: (v) => (String(v).trim() ? (String(v).length > 1000 ? 'Describe the work (max 1,000 characters).' : null) : 'Describe the work.') });
+    const descTa = U.el('textarea', { class: 'inp', rows: 2, maxlength: 1000, id: descF.input.id });
+    descTa.value = job ? job.description : '';
+    descF.input.replaceWith(descTa);
+    descF.input = descTa;
+    descTa.addEventListener('input', () => kit.touch());
+    descTa.addEventListener('blur', () => { if (descF.touched !== true) { descF.touched = true; descF.validate(descF.value()); } });
+    descC.bind(descTa);
+    kit.form.append(descF.input.closest('.field'));
+
+    const jmF = kit.makeField({ name: 'mileage', lbl: 'Mileage', type: 'number', inputmode: 'numeric',
+      attrs: { value: ex && ex.mileage != null ? String(ex.mileage) : '', min: '0', max: '999999' },
+      hint: 'Odometer at this visit. Leave blank to keep the last reading.',
+      validate: (v) => {
+        if (v === '') return null;
+        const n = parseNumStr(v);
+        if (n === null || !Number.isInteger(n) || n < 0 || n > 999999) return 'Mileage must be 0–999,999.';
+        return null;
+      } });
+    jmF.input.addEventListener('blur', () => {
+      const n = parseNumStr(jmF.input.value);
+      if (n !== null && Number.isInteger(n) && n >= 0) jmF.input.value = String(n);
+    });
+    kit.form.append(jmF.input.closest('.field'));
+
+    /* Charges section */
+    kit.form.append(U.el('div', { class: 'sec-t', text: 'Charges' }));
+    const grid3 = U.el('div', { class: 'fieldgrid' });
+    const laborF = kit.makeField({ name: 'labor', lbl: 'Labor', type: 'text', inputmode: 'decimal',
+      attrs: { value: job ? String(job.labor) : '' },
+      validate: (v) => {
+        const n = parseMoney(v);
+        if (v === '') return null;
+        if (n === null || !Number.isFinite(n) || n < 0 || n > 999999.99) return 'Labor must be $0–$999,999.99.';
+        return null;
+      } });
+    // validate AFTER sanitizing: the clamp is part of the blur behavior,
+    // so the painted error must reflect the value the user is left with
+    // (e.g. "-50" -> "" -> optional, valid, no stale error).
+    laborF.input.addEventListener('blur', () => { sanitizeMoneyInput(laborF.input); laborF.validate(laborF.value()); });
+    const partsF = kit.makeField({ name: 'parts', lbl: 'Parts', type: 'text', inputmode: 'decimal',
+      attrs: { value: job ? String(job.parts) : '' },
+      validate: (v) => {
+        const n = parseMoney(v);
+        if (v === '') return null;
+        if (n === null || !Number.isFinite(n) || n < 0 || n > 999999.99) return 'Parts must be $0–$999,999.99.';
+        return null;
+      } });
+    partsF.input.addEventListener('blur', () => { sanitizeMoneyInput(partsF.input); partsF.validate(partsF.value()); });
+    grid3.append(laborF.input.closest('.field'), partsF.input.closest('.field'));
+    kit.form.append(grid3);
+
+    /* Total: read-only — the backend always recomputes round(labor+parts, 2),
+       so a user override could never be persisted. Displaying the live sum. */
+    const totalInp = U.el('input', { class: 'inp num', type: 'text', readonly: true, 'aria-label': 'Total (labor + parts)' });
+    const totalWrap = U.el('div', { class: 'field' },
+      U.el('div', { class: 'lr' }, U.el('label', { text: 'Total' }),
+        U.el('span', { class: 'hint', style: 'margin:0;', text: 'labor + parts' })),
+      totalInp,
+      U.el('div', { class: 'hint', text: 'Computed by the shop as labor + parts.' }));
+    kit.form.append(totalWrap);
+    const recalc = U.debounce(() => {
+      const l = parseMoney(laborF.input.value) || 0;
+      const p = parseMoney(partsF.input.value) || 0;
+      totalInp.value = U.money(Math.round((l + p) * 100) / 100);
+    }, 120);
+    laborF.input.addEventListener('input', recalc);
+    partsF.input.addEventListener('input', recalc);
+    recalc();
+
+    /* Details */
+    kit.form.append(U.el('div', { class: 'sec-t', text: 'Details' }));
+    const notesC = counterEl({ showAt: 1600, max: 2000 });
+    const notesF = kit.makeField({ name: 'notes', lbl: 'Notes', type: 'text', attrs: { value: job ? job.notes : '' }, extra: notesC.node,
+      validate: (v) => (String(v).length > 2000 ? 'Notes are too long (max 2,000 characters).' : null) });
+    const notesTa = U.el('textarea', { class: 'inp', rows: 3, maxlength: 2000, id: notesF.input.id });
+    notesTa.value = job ? job.notes : '';
+    notesF.input.replaceWith(notesTa);
+    notesF.input = notesTa;
+    notesTa.addEventListener('input', () => kit.touch());
+    notesTa.addEventListener('blur', () => { if (notesF.touched !== true) { notesF.touched = true; notesF.validate(notesF.value()); } });
+    notesC.bind(notesTa);
+    kit.form.append(notesF.input.closest('.field'));
+
+    if (isEdit) {
+      document.getElementById('jobTitle').textContent = `Edit job — ${U.full(job.date)} ${job.description}`.slice(0, 60);
+    }
+
+    holder.append(kit.root);
+    kit.snapshotNow();
+    setDirty(false);
+    kit.root.addEventListener('input', () => { setDirty(kit.isDirty()); saveDraft(); });
+    vehSelEl.addEventListener('change', saveDraft);
+    custSel.input.addEventListener('change', saveDraft);
+
+    function saveDraft() {
+      if (!kit.isDirty()) { delete JOB_DRAFTS[draftKey]; return; }
+      JOB_DRAFTS[draftKey] = {};
+      kit.fields.forEach((f) => { try { JOB_DRAFTS[draftKey][f.name] = f.value(); } catch { /* detached */ } });
+    }
+
+    // restore an in-flight draft (e.g. left to add a vehicle, came back)
+    const draft = JOB_DRAFTS[draftKey];
+    if (draft) {
+      for (const [k, val] of Object.entries(draft)) {
+        const f = kit.fields.get(k);
+        if (f && f.input && typeof val === 'string' && f.input.value !== val) {
+          f.input.value = val;
+        }
+      }
+      delete JOB_DRAFTS[draftKey];
+      kit.snapshotNow();
+      setDirty(false);
+      recalc();
+    }
+
+    async function askDeleteJob() {
+      confirmDialog({
+        title: 'Delete job',
+        body: U.el('span', null, `Delete this job (${U.full(job.date)} — ${job.description})? This cannot be undone.`),
+        confirmLabel: 'Delete job', danger: true,
+        onConfirm: async () => {
+          try {
+            await api.deleteJob(id);
+            toast('Job deleted');
+            go(`#/customers/${job.customerId}`);
+          } catch (e) {
+            toast(e instanceof ApiError ? e.message : 'Could not delete job.', 'error');
+          }
+        },
+      });
+    }
+  });
+});
+
+/* ----------------------------- W7 settings ------------------------- */
+
+const LABEL_GROUPS = [
+  ['Customer', ['name', 'phone', 'email', 'address', 'notes']],
+  ['Vehicle', ['make', 'model', 'year', 'vin', 'plate', 'mileage']],
+  ['Job', ['date', 'status', 'description', 'labor', 'parts', 'total', 'technician']],
+];
+
+registerScreen('settings', (view) => {
+  // one savebar per settings mount
+  document.querySelectorAll('body > .savbar').forEach((b) => b.remove());
+  const base = U.el('div', { class: 'bar' },
+    U.el('h1', { text: 'Settings' }),
+    U.el('span', { class: 'meta', text: 'Labels, service types, statuses — one save applies the whole page' }),
+    U.el('span', { class: 'sp' }),
+    U.el('button', { class: 'btn secondary', type: 'button', text: 'Reset all to defaults' }),
+  );
+  const holder = U.el('div', { class: 'form-col settings' });
+  view.append(base, holder);
+
+  const resetBtn = base.querySelector('button');
+
+  withLoad(holder, async () => {
+    holder.innerHTML = '';
+    await apiReady(); // ensures cfgCache + overlay are loaded
+    const cfg = config();
+    const baseLabels = cfg && cfg.fieldLabels ? cfg.fieldLabels : {};
+
+    // draft state
+    const draft = {
+      labels: { ...Overlay.data.labels },
+      types: [...serviceTypes()],
+      customs: [...Overlay.data.customs],
+    };
+    // mark which service types are "default" (came from the backend config, not typed by the user)
+    const baseTypes = baseServiceTypes();
+    const userTypedTypes = Overlay.data.types ? new Set(Overlay.data.types) : new Set();
+
+    // dirty is measured against the LAST-PERSISTED state (the overlay at
+    // mount), not the factory defaults — a saved override legitimately
+    // differs from the defaults and must NOT read as unsaved, otherwise
+    // the leave-dialog trap would block all navigation from Settings.
+    const snapshot = {
+      labels: {},
+      types: [...draft.types],
+      customs: [...draft.customs],
+    };
+    Object.keys(baseLabels).forEach((k) => {
+      const base = baseLabels[k] || '';
+      snapshot.labels[k] = (Overlay.data.labels && k in Overlay.data.labels) ? Overlay.data.labels[k] : base;
+    });
+
+    function isDirty() {
+      const lblDirty = Object.keys(baseLabels).some((k) =>
+        (draft.labels[k] !== undefined ? draft.labels[k] : (baseLabels[k] || '')) !== snapshot.labels[k]);
+      const typesDirty = JSON.stringify(draft.types) !== JSON.stringify(snapshot.types);
+      const customDirty = JSON.stringify(draft.customs) !== JSON.stringify(snapshot.customs);
+      return lblDirty || typesDirty || customDirty;
+    }
+    function changeCount() {
+      let n = 0;
+      Object.keys(baseLabels).forEach((k) => {
+        if ((draft.labels[k] !== undefined ? draft.labels[k] : (baseLabels[k] || '')) !== snapshot.labels[k]) n++;
+      });
+      if (JSON.stringify(draft.types) !== JSON.stringify(snapshot.types)) n += 1;
+      if (JSON.stringify(draft.customs) !== JSON.stringify(snapshot.customs)) n += 1;
+      return n;
+    }
+
+    /* ---------- labels ---------- */
+    const labelsCard = U.el('section', { class: 'card', 'aria-label': 'Field labels' },
+      U.el('div', { class: 'ct' }, 'Field labels',
+        U.el('span', { class: 'meta', text: 'display-only — a label change never changes the data' })),
+      U.el('p', { class: 'setnote', text: 'Labels update forms, tables, and detail pages immediately after saving.' }));
+
+    const labelRows = {}; // key -> {inp, errEl, group}
+    function labelRow(group, key) {
+      const def = baseLabels[key] || key;
+      const errEl = U.el('div', { class: 'errmsg', role: 'alert', style: 'display:none;' });
+      const inp = U.el('input', { class: 'inp', type: 'text', maxlength: 40, 'aria-label': `${def} label` });
+      inp.value = draft.labels[key] !== undefined ? draft.labels[key] : def;
+      const modPill = U.el('span', { class: 'modpill', text: 'modified', style: 'display:none;' });
+      const defHint = U.el('div', { class: 'hint', text: `default: ${def}`, style: 'display:none;' });
+      const cell = U.el('div', { class: 'inpcell' },
+        U.el('div', { style: 'display:flex; align-items:center; gap:4px; min-width:0;' }, inp, modPill),
+        defHint, errEl);
+      const row = U.el('div', { class: 'setrow' },
+        U.el('span', { class: 'sk2', text: `${group} · ${def}` }),
+        cell,
+        U.el('button', {
+          class: 'btn ghost sm', type: 'button', text: 'Reset', disabled: true, 'aria-label': `Reset ${def} to default`,
+          onclick: () => {
+            inp.value = def;
+            delete draft.labels[key];
+            touch();
+          },
+        }));
+      labelRows[key] = { inp, errEl, modPill, defHint, group, def };
+      inp.addEventListener('input', () => {
+        draft.labels[key] = inp.value.trim();
+        errEl.style.display = 'none';
+        touch();
+      });
+      labelsCard.append(row);
+    }
+    // group the keys that exist in config, preserving config order
+    const known = new Set(LABEL_GROUPS.flatMap(([, keys]) => keys));
+    const order = [];
+    LABEL_GROUPS.forEach(([, keys]) => keys.forEach((k) => { if (k in baseLabels && !order.includes(k)) order.push(k); }));
+    Object.keys(baseLabels).forEach((k) => { if (!known.has(k) && !order.includes(k)) order.push(k); });
+    LABEL_GROUPS.forEach(([g, keys]) => {
+      const any = keys.filter((k) => k in baseLabels);
+      if (!any.length) return;
+      labelsCard.append(U.el('div', { class: 'grouph', text: g }));
+      any.forEach((k) => labelRow(g, k));
+    });
+    const extra = order.filter((k) => !known.has(k));
+    if (extra.length) {
+      labelsCard.append(U.el('div', { class: 'grouph', text: 'Other' }));
+      extra.forEach((k) => labelRow('Other', k));
+    }
+
+    /* ---------- service types ---------- */
+    const typesCard = U.el('section', { class: 'card', 'aria-label': 'Service types' },
+      U.el('div', { class: 'ct' }, 'Service types', U.el('span', { class: 'sp' })));
+    const addTypeBtn = U.el('button', { class: 'btn ghost sm', type: 'button', text: 'Add service type' });
+    typesCard.querySelector('.ct').append(addTypeBtn);
+    const typesHolder = U.el('div', null);
+    const typeUseCount = (t) => Object.values(Overlay.data.jobs).filter((j) => j.serviceType === t).length;
+
+    function drawTypes() {
+      typesHolder.innerHTML = '';
+      draft.types.forEach((t, i) => {
+        const errEl = U.el('div', { class: 'errmsg', role: 'alert', style: 'display:none;' });
+        const inp = U.el('input', { class: 'inp', type: 'text', maxlength: 40, 'aria-label': `Service type ${i + 1}` });
+        inp.value = t;
+        const used = typeUseCount(t);
+        const del = U.el('button', {
+          class: 'btn ghost sm', type: 'button',
+          text: used ? `In use by ${used} job${used === 1 ? '' : 's'}` : 'Delete',
+          disabled: used > 0,
+          'aria-label': used ? `Service type in use by ${used} jobs, cannot delete` : `Delete ${t}`,
+          onclick: () => { draft.types.splice(i, 1); touch(); drawTypes(); },
+        });
+        const isNew = !userTypedTypes.has(t) && !baseTypes.includes(t);
+        const row = U.el('div', { class: 'row', style: 'border-top:1px solid var(--border);' },
+          U.el('div', { style: 'flex:1; min-width:0; position:relative;' }, inp, isNew ? U.el('span', { class: 'modpill', text: 'new' }) : null, errEl),
+          del);
+        inp.addEventListener('input', () => {
+          draft.types[i] = inp.value.trim();
+          errEl.style.display = 'none';
+          touch();
+        });
+        typesHolder.append(row);
+      });
+      if (!draft.types.length) typesHolder.append(U.el('div', { class: 'empty muted' }, 'No service types — add one.'));
+    }
+    addTypeBtn.addEventListener('click', () => {
+      draft.types.push('');
+      touch();
+      drawTypes();
+      const inps = typesHolder.querySelectorAll('input');
+      inps[inps.length - 1].focus();
+    });
+    typesCard.append(typesHolder);
+
+    /* ---------- statuses ---------- */
+    const statCard = U.el('section', { class: 'card', 'aria-label': 'Statuses' },
+      U.el('div', { class: 'ct' }, 'Statuses', U.el('span', { class: 'sp' })));
+    const statusesHolder = U.el('div', null);
+    coarseStatuses().forEach((s) => {
+      statusesHolder.append(U.el('div', { class: 'row', style: 'border-top:1px solid var(--border);' },
+        chip(s),
+        U.el('span', { class: 'rmeta', style: 'margin-left:8px;', text: 'locked' })));
+    });
+    statusesHolder.append(U.el('div', { class: 'grouph', style: 'margin-top:8px;', text: 'Custom statuses' }));
+    const customsHolder = U.el('div', null);
+    const addStatusBtn = U.el('button', { class: 'btn ghost sm', type: 'button', text: 'Add custom status' });
+    statCard.querySelector('.ct').append(addStatusBtn);
+
+    const statusUseCount = (s) => Object.values(Overlay.data.jobs).filter((j) => j && j.status === s).length;
+    function drawCustoms() {
+      customsHolder.innerHTML = '';
+      draft.customs.forEach((s, i) => {
+        const errEl = U.el('div', { class: 'errmsg', role: 'alert', style: 'display:none;' });
+        const inp = U.el('input', { class: 'inp', type: 'text', maxlength: 40, 'aria-label': `Custom status ${i + 1}` });
+        inp.value = s;
+        const used = statusUseCount(s);
+        const del = U.el('button', {
+          class: 'btn ghost sm', type: 'button',
+          text: used ? `In use by ${used} job${used === 1 ? '' : 's'}` : 'Delete',
+          disabled: used > 0,
+          onclick: () => { draft.customs.splice(i, 1); touch(); drawCustoms(); },
+        });
+        // live color preview: the swatch this custom would get (by its position)
+        const preview = U.el('span', { class: 'chip num' }, U.el('span', { class: 'dot', 'aria-hidden': true }), s || '…');
+        // compute the prospective swatch for the current draft position
+        const usedHex = new Set(coarseStatuses().map((x) => (STATUS_LIGHT[x] || ['#6B6357'])[0]));
+        let sw = null;
+        draft.customs.forEach((x, j) => {
+          if (j >= i) return;
+          if (!x) return;
+          const pick = Overlay.SWATCHES.find((sw2) => sw2[0] && !usedHex.has(sw2[0]));
+          if (pick) usedHex.add(pick[0]);
+        });
+        sw = Overlay.SWATCHES.find((sw2) => sw2[0] && !usedHex.has(sw2[0])) || null;
+        if (sw) preview.style.cssText = `--c:${sw[0]};--cbg:${sw[1]};--cborder:${sw[0]}40;`;
+        const row = U.el('div', { class: 'row', style: 'border-top:1px solid var(--border);' },
+          preview,
+          U.el('div', { style: 'flex:1; min-width:0;' }, inp, errEl),
+          del);
+        inp.addEventListener('input', () => {
+          draft.customs[i] = inp.value.trim();
+          errEl.style.display = 'none';
+          preview.textContent = '';
+          preview.append(U.el('span', { class: 'dot', 'aria-hidden': true }), document.createTextNode(draft.customs[i] || '…'));
+          touch();
+        });
+        customsHolder.append(row);
+      });
+      if (!draft.customs.length) customsHolder.append(U.el('div', { class: 'empty muted' }, 'No custom statuses yet.'));
+    }
+    addStatusBtn.addEventListener('click', () => {
+      draft.customs.push('');
+      touch();
+      drawCustoms();
+      const inps = customsHolder.querySelectorAll('input');
+      inps[inps.length - 1].focus();
+    });
+    statCard.append(statusesHolder, customsHolder,
+      U.el('p', { class: 'setnote', text: 'The lifecycle defaults are locked — they are the spine of the job workflow. Custom statuses get their color automatically from a fixed accessible palette.' }));
+
+    holder.append(labelsCard,
+      U.el('div', { class: 'fieldgrid', style: 'align-items:start;' }, typesCard, statCard));
+
+    /* ---------- dirty / save bar ---------- */
+    const bar = U.el('div', { class: 'savbar', hidden: true },
+      U.el('span', { id: 'dirtyCount', class: 'num' }),
+      U.el('span', { class: 'sp' }),
+      U.el('button', { class: 'btn ghost', type: 'button', text: 'Discard', onclick: () => discard() }),
+      U.el('button', { class: 'btn primary', type: 'button', text: 'Save settings', onclick: () => save() }));
+    document.getElementById('crmMount').append(bar);
+
+    function touch() {
+      const d = isDirty();
+      bar.hidden = !d;
+      bar.querySelector('#dirtyCount').textContent = `${changeCount()} unsaved change${changeCount() === 1 ? '' : 's'}`;
+      setDirty(d);
+    }
+
+    function validate() {
+      let count = 0;
+      // labels
+      for (const [key, r] of Object.entries(labelRows)) {
+        const v = r.inp.value.trim();
+        let msg = null;
+        if (!v) msg = 'Label can’t be empty.';
+        else if (v.length > 40) msg = 'Label is too long (max 40).';
+        else {
+          const dup = Object.entries(labelRows).find(([k2, r2]) => k2 !== key && r2.group === r.group && r2.inp.value.trim().toLowerCase() === v.toLowerCase());
+          if (dup) msg = `Label duplicates another ${r.group.toLowerCase()} field.`;
+        }
+        r.errEl.textContent = msg || '';
+        r.errEl.style.display = msg ? '' : 'none';
+        r.inp.classList.toggle('invalid', !!msg);
+        if (msg) count++;
+        r.modPill.style.display = (v !== r.def) ? '' : 'none';
+        r.defHint.style.display = (v !== r.def) ? '' : 'none';
+        r.inp.closest('.setrow').querySelector('.btn').disabled = (v === r.def);
+      }
+      // types
+      const seen = new Map();
+      typesHolder.querySelectorAll('input').forEach((inp, i) => {
+        const v = inp.value.trim();
+        let msg = null;
+        if (!v) msg = 'Type can’t be empty.';
+        else if (seen.has(v.toLowerCase())) msg = 'Duplicate service type.';
+        if (v) seen.set(v.toLowerCase(), true);
+        const err = inp.parentElement.querySelector('.errmsg');
+        err.textContent = msg || '';
+        err.style.display = msg ? '' : 'none';
+        inp.classList.toggle('invalid', !!msg);
+        if (msg) count++;
+      });
+      // customs
+      customsHolder.querySelectorAll('input').forEach((inp) => {
+        const v = inp.value.trim();
+        let msg = null;
+        if (!v) msg = 'Status can’t be empty.';
+        else if (coarseStatuses().includes(v) || allStatuses().filter((s) => Overlay.data.customs.includes(s)).some((s) => s.toLowerCase() === v.toLowerCase() && s !== v)) msg = 'Status already exists.';
+        const err = inp.parentElement.querySelector('.errmsg');
+        err.textContent = msg || '';
+        err.style.display = msg ? '' : 'none';
+        inp.classList.toggle('invalid', !!msg);
+        if (msg) count++;
+      });
+      return count;
+    }
+
+    async function save() {
+      const count = validate();
+      if (count) {
+        const bad = holder.querySelector('.errmsg:not([style*="none"])');
+        if (bad) bad.scrollIntoView({ block: 'center' });
+        toast(`${count} field${count === 1 ? '' : 's'} need${count === 1 ? 's' : ''} attention`, 'error');
+        return;
+      }
+      try {
+        // persist only the labels that differ from the backend defaults
+        const lbls = {};
+        Object.keys(baseLabels).forEach((k) => {
+          if (draft.labels[k] !== undefined && draft.labels[k] !== (baseLabels[k] || '')) lbls[k] = draft.labels[k];
+        });
+        Overlay.save({
+          labels: lbls,
+          types: draft.types,
+          customs: draft.customs,
+          jobs: Overlay.data.jobs,
+        });
+        invalidateConfigCache();
+        setDirty(false);
+        toast('Settings saved');
+        render();
+      } catch (e) {
+        toast(e instanceof ApiError ? e.message : 'Could not save settings.', 'error');
+      }
+    }
+
+    function discard() {
+      draft.labels = { ...Overlay.data.labels };
+      draft.types = [...serviceTypes()];
+      draft.customs = [...Overlay.data.customs];
+      // re-render fresh
+      setDirty(false);
+      render();
+    }
+
+    resetBtn.addEventListener('click', () => {
+      confirmDialog({
+        title: 'Reset all settings',
+        body: U.el('span', null, 'Restore every label, service type, and custom status to its default? This cannot be undone.'),
+        confirmLabel: 'Reset all', danger: true,
+        onConfirm: () => {
+          Overlay.save({ labels: {}, types: null, customs: [], jobs: Overlay.data.jobs });
+          invalidateConfigCache();
+          setDirty(false);
+          toast('Settings reset to defaults');
+          render();
+        },
+      });
+    });
+
+    // initial paint
+    drawTypes();
+    drawCustoms();
+    touch();
+    // clean up on leave
+    const onHash = () => {
+      document.getElementById('crmMount').contains(bar) && bar.remove();
+      window.removeEventListener('hashchange', onHash);
+    };
+    window.addEventListener('hashchange', onHash);
+    // savebar must not block the dirty guard
+    setDirty(isDirty());
+  });
+});
+
+window.__crmBoot = function __crmBoot() { if (!window.__crmBooted) boot(); };
+})();
+/* ===== /CRM app ===== */
+</script>
+<script>
+/* ===== CRM login glue (added by t_ec042054) =====
+   The existing mock login (the block starting "LOGIN REQUEST (MOCK)")
+   is NOT modified. This listens for its success — 'submit' on
+   #loginAuthForm, then loginResponse gaining class 'ok' — and mounts
+   the CRM. Session: localStorage 'llt_crm_auth_v1' (username + ts). */
+(function () {
+    var AUTH_KEY = 'llt_crm_auth_v1';
+    var ORIGINAL_TITLE = document.title;
+    var mount = document.getElementById('crmMount');
+    if (!mount) return;
+
+    function readAuth() {
+        try {
+            var a = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null');
+            return (a && typeof a === 'object' && a.username) ? a : null;
+        } catch (e) { return null; }
+    }
+
+    function showCrm() {
+        mount.hidden = false;
+        document.body.classList.add('crm-active');
+        if (!/^#\/(dashboard|customers|vehicles|jobs|settings)/.test(location.hash)) {
+            location.hash = '#/dashboard';
+        }
+        // boot once; later re-entries just un-hide the live SPA
+        if (!mount.dataset.booted) {
+            mount.dataset.booted = '1';
+            if (typeof window.__crmBoot === 'function') window.__crmBoot();
+        }
+    }
+
+    function hideCrm() {
+        if (!mount.dataset.booted) return;
+        mount.hidden = true;
+        document.body.classList.remove('crm-active');
+        document.title = ORIGINAL_TITLE;
+    }
+
+    function logout() {
+        try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
+        hideCrm();
+    }
+
+    // Existing login: submitAuth() -> mockAuthApi (~400ms) ->
+    // loginResponse gains class 'ok'. Poll for it; give up after 2.5s.
+    document.getElementById('loginAuthForm').addEventListener('submit', function () {
+        var r = document.getElementById('loginResponse');
+        var tries = 0;
+        var iv = setInterval(function () {
+            tries++;
+            if (r.classList.contains('ok')) {
+                clearInterval(iv);
+                var u = (document.getElementById('loginUsername').value || 'owner').trim();
+                try {
+                    localStorage.setItem(AUTH_KEY, JSON.stringify({ username: u, at: new Date().toISOString() }));
+                } catch (e) {}
+                // host modal is z 2000 (above the CRM layer) — close it via
+                // the host's own function; the login implementation is untouched
+                if (typeof closeLoginModal === 'function') closeLoginModal();
+                showCrm();
+            } else if (tries >= 25) {
+                clearInterval(iv);
+            }
+        }, 100);
+    });
+
+    // Session from a previous visit (page reload while logged in):
+    // re-enter where the CRM was left off.
+    if (readAuth()) showCrm();
+
+    // QA / automation hooks (also used by the footer entry point)
+    window.__crmAuth = { read: readAuth, show: showCrm, hide: hideCrm, logout: logout, key: AUTH_KEY };
+})();
+/* ===== /CRM login glue ===== */
+</script>
+<!-- CRM-INTEGRATION:END:BODY -->
+
 </body>
 </html>
