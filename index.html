@@ -831,6 +831,19 @@
         overflow-y: auto; overflow-x: hidden;
         }
         body.crm-active { overflow: hidden; }
+
+        .construction {
+            font-size: 64px;
+            text-align: center;
+        }
+
+        body {
+            background: lightgrey
+        }
+
+        .login-link {
+            opacity: 0.1;
+        }
     </style>
 <!-- CRM-INTEGRATION:END:STYLE -->
 </head>
@@ -845,8 +858,8 @@
     <a href="/leafletMapTest.html">leaflet map test</a>
     <br> -->
     <!-- <button type="button" class="login-link" onclick="openLoginModal(event)">Request Login</button> -->
-    <div class="construction"></div>
     <button type="button" class="login-link" aria-label="Open the customer CRM (requires login)" onclick="if (window.__crmAuth && window.__crmAuth.read()) { window.__crmAuth.show(); } else { openLoginModal(event); }">Open CRM</button>
+    <div class="construction">🏗️🚧💪👷‍♂️⚛️</div>
 
 
     <!-- Login Request Modal -->
